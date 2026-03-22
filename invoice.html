@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Demo Digital Beometrik Mandiri Balikpapan</title>
+    <link rel="stylesheet" href="invoice.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-img">🏢</div>
+                <div class="company-info">
+                    <h3>DEMO DIGITAL BEOMETRIK</h3>
+                    <p>MANDIRI</p>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <div class="menu-section">
+                    <h4>MENU UTAMA</h4>
+                    <ul>
+                        <li><a href="index.html"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a></li>
+                        <li><a href="#"><i class="fas fa-users"></i><span>Organisasi</span></a></li>
+                        <li><a href="#"><i class="fas fa-user-tie"></i><span>Karyawan</span></a></li>
+                        <li><a href="office.html"><i class="fas fa-building"></i><span>Kantor</span></a></li>
+                        <li><a href="#"><i class="fas fa-user-shield"></i><span>Perangkat Absensi</span></a></li>
+                        <li><a href="#"><i class="fas fa-clipboard-list"></i><span>Penggajian</span><span class="badge">2</span></a></li>
+                        <li><a href="#"><i class="fas fa-calendar-check"></i><span>Absensi</span></a></li>
+                        <li><a href="#"><i class="fas fa-bullhorn"></i><span>Pengumuman</span></a></li>
+                        <li><a href="#"><i class="fas fa-graduation-cap"></i><span>E-Learning</span></a></li>
+                        <li><a href="#"><i class="fas fa-file-alt"></i><span>Laporan</span></a></li>
+                        <li><a href="#"><i class="fas fa-briefcase"></i><span>Panitia Kerja</span></a></li>
+                        <li><a href="#"><i class="fas fa-question-circle"></i><span>Umum</span></a></li>
+                        <li class="active"><a href="invoice.html"><i class="fas fa-file-invoice"></i><span>Invoice</span></a></li>
+                        <li><a href="#"><i class="fas fa-puzzle-piece"></i><span>Partner Apps</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" type="button" aria-label="Buka menu navigasi">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <p class="header-eyebrow">Cabang Balikpapan</p>
+                        <h1>Invoice</h1>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="header-icons">
+                        <div class="icon-item">
+                            <i class="fas fa-bell"></i>
+                            <span class="notification-badge">3</span>
+                        </div>
+                        <div class="icon-item">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge">2</span>
+                        </div>
+                        <div class="icon-item">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="icon-item">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <span>Admin</span>
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                </div>
+            </header>
+
+            <div class="mobile-header">
+                <button class="menu-btn" type="button" aria-label="Buka menu navigasi">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <section class="invoice-overview">
+                <article class="invoice-stat due-card">
+                    <span class="card-kicker">Status Invoice</span>
+                    <div class="days-card">
+                        <span class="days-number">19</span>
+                        <div class="days-copy">
+                            <strong>hari lagi</strong>
+                            <span>Sebelum jatuh tempo perpanjangan layanan cabang.</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="invoice-stat meta-card">
+                    <span class="card-kicker">Invoice Aktif</span>
+                    <h2>DBM-BPN-INV-2026-03</h2>
+                    <div class="invoice-meta">
+                        <span>Maret 2026</span>
+                        <span>180 hari layanan</span>
+                        <span>Balikpapan</span>
+                    </div>
+                </article>
+
+                <article class="invoice-stat total-card">
+                    <span class="card-kicker">Tagihan</span>
+                    <div class="total-copy">
+                        <strong>Rp302.000</strong>
+                        <span>Total sudah termasuk PPN layanan.</span>
+                    </div>
+                    <button class="invoice-action" type="button">
+                        <i class="fas fa-file-arrow-down"></i>
+                        Unduh Ringkasan
+                    </button>
+                </article>
+            </section>
+
+            <section class="invoice-container">
+                <div class="section-head">
+                    <div>
+                        <span class="card-kicker">Dokumen Tagihan</span>
+                        <h2>Invoice Cabang Balikpapan</h2>
+                    </div>
+                    <p class="section-meta">Periode Maret 2026</p>
+                </div>
+
+                <div class="invoice-intro">
+                    <article class="intro-card billing-card">
+                        <span class="card-kicker">Diterbitkan Untuk</span>
+                        <h3>Digital Beometrik Mandiri Balikpapan</h3>
+                        <p>
+                            Ruko Balikpapan Permai,<br>
+                            Jl. Jenderal Sudirman,<br>
+                            Kec. Balikpapan Kota,<br>
+                            Kota Balikpapan, Kalimantan Timur 76114
+                        </p>
+                    </article>
+
+                    <article class="intro-card summary-card">
+                        <span class="card-kicker">Ringkasan Pembayaran</span>
+                        <div class="summary-stack">
+                            <div class="summary-line">
+                                <span>Subtotal layanan</span>
+                                <strong>Rp302.000</strong>
+                            </div>
+                            <div class="summary-line">
+                                <span>PPN</span>
+                                <strong>Termasuk</strong>
+                            </div>
+                            <div class="summary-line total-line">
+                                <span>Total tagihan</span>
+                                <strong>Rp302.000</strong>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="invoice-table-wrapper">
+                    <div class="table-headline">
+                        <div>
+                            <span class="card-kicker">Rincian Layanan</span>
+                            <p>Rincian paket dan add-on aktif untuk akun demo cabang Balikpapan.</p>
+                        </div>
+                        <span class="section-meta">4 item aktif</span>
+                    </div>
+
+                    <div class="invoice-table">
+                        <div class="table-header">
+                            <div class="col-desc">Deskripsi</div>
+                            <div class="col-qty">Qty</div>
+                            <div class="col-price">Harga</div>
+                            <div class="col-total">Total Harga</div>
+                        </div>
+
+                        <div class="section-title">Paket Layanan</div>
+
+                        <div class="table-row">
+                            <div class="col-desc">
+                                <strong>Paket Perangkat Absensi</strong><br>
+                                <small>Estimasi poin digunakan: 75.000</small>
+                            </div>
+                            <div class="col-qty">1</div>
+                            <div class="col-price">Rp300.000</div>
+                            <div class="col-total">
+                                <span class="price-main">Rp225.000</span><br>
+                                <span class="price-crossed">Rp300.000</span>
+                            </div>
+                        </div>
+
+                        <div class="section-title">Add-on</div>
+
+                        <div class="table-row">
+                            <div class="col-desc">
+                                <strong>Absensi GPS via Ponsel</strong>
+                            </div>
+                            <div class="col-qty">1</div>
+                            <div class="col-price">Rp56.000</div>
+                            <div class="col-total">Rp56.000</div>
+                        </div>
+
+                        <div class="table-row">
+                            <div class="col-desc">
+                                <strong>Terima Notifikasi Kehadiran</strong>
+                            </div>
+                            <div class="col-qty">1</div>
+                            <div class="col-price">Rp17.500</div>
+                            <div class="col-total">Rp17.500</div>
+                        </div>
+
+                        <div class="section-title">Kuota Karyawan</div>
+
+                        <div class="table-row">
+                            <div class="col-desc">
+                                <strong>Kuota Karyawan di Perangkat Absensi per 1 orang</strong><br>
+                                <small>Kuota aktif untuk 1 karyawan tambahan.</small>
+                            </div>
+                            <div class="col-qty">1</div>
+                            <div class="col-price">Rp3.500</div>
+                            <div class="col-total">Rp3.500</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="invoice-details">
+                    <article class="details-card details-left">
+                        <h3>Keterangan Layanan</h3>
+                        <div class="detail-item">
+                            <span class="label">Kode Invoice</span>
+                            <span class="value">DBM-BPN-INV-2026-03</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Promo</span>
+                            <span class="value">Paket Cabang Balikpapan</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Durasi</span>
+                            <span class="value">180 hari layanan aktif</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Jatuh Tempo</span>
+                            <span class="value">19 September 2026</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Catatan</span>
+                            <span class="value">Invoice ini digunakan untuk perpanjangan layanan perangkat absensi akun Demo Digital Beometrik Mandiri cabang Balikpapan.</span>
+                        </div>
+                    </article>
+
+                    <article class="details-card details-right">
+                        <h3>Ringkasan Tagihan</h3>
+                        <div class="price-summary">
+                            <div class="price-row">
+                                <span>Subtotal</span>
+                                <span>Rp302.000</span>
+                            </div>
+                            <div class="price-row">
+                                <span>PPN</span>
+                                <span>Termasuk</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Status</span>
+                                <span>Belum Dibayar</span>
+                            </div>
+                            <div class="price-row total-row">
+                                <span>Total Tagihan</span>
+                                <span>Rp302.000</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Perlu Dibayar</span>
+                                <span>Rp302.000</span>
+                            </div>
+                        </div>
+                        <div class="payment-note">
+                            <i class="fas fa-circle-info"></i>
+                            <p>Pembayaran dapat diproses sebelum 19 September 2026 agar layanan cabang tetap aktif tanpa jeda.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="footer-message">
+                    <p>Transaksi sudah termasuk PPN layanan. Jika Anda memerlukan faktur pajak atau bantuan aktivasi perpanjangan, silakan hubungi admin Digital Beometrik Mandiri Balikpapan.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
