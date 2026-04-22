@@ -5,6 +5,10 @@
  * This sample demonstrates how to send employee data to the
  * attendance machine.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -63,6 +67,7 @@ if (curl_errno($ch)) {
         echo "Note: The machine will process this command and report the result via Webhook.\n";
     } else {
         echo "Failed to send command.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -70,7 +75,13 @@ if (curl_errno($ch)) {
 curl_close($ch);
 
 /*
-Example Request Body:
+Example Request:
+--------------------------------------------------
+POST /api/set_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
 {
     "trans_id": "1",
     "cloud_id": "FTV123456",
@@ -82,6 +93,7 @@ Example Request Body:
 }
 
 Example Response (Success):
+--------------------------------------------------
 {
     "status": true,
     "message": "Success"

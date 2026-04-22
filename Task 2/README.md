@@ -1,8 +1,23 @@
 # Task 2: Fingerspot API Integration & Sample Code
 
-This folder contains the results of the Task 2 internship project, focused on integrating with the Fingerspot Cloud API.
+This folder contains the deliverables for Task 2 of the Fingerspot Internship project. It includes runnable sample codes for all main API features and a comprehensive mini-demo application.
 
-## Project Structure
+## 📋 Main API Endpoints
+
+The following endpoints from [developer.fingerspot.io](https://developer.fingerspot.io) have been identified and implemented:
+
+| Endpoint | Description |
+| :--- | :--- |
+| `/api/get_device` | Retrieve all registered attendance machines. |
+| `/api/get_attlog` | Fetch attendance scan logs with date range filtering. |
+| `/api/set_userinfo` | Upload or update user information on the device. |
+| `/api/get_userinfo` | Request specific user information from the device. |
+| `/api/delete_userinfo` | Remotely delete a user from the device. |
+| `/api/reg_online` | Trigger remote registration mode on the device. |
+| `/api/set_time` | Synchronize device time and timezone. |
+| `/api/restart` | Remotely reboot the attendance machine. |
+
+## 📂 Folder Structure
 
 ```text
 Task 2/
@@ -10,57 +25,42 @@ Task 2/
 │   ├── auth/             # Authentication & Header setup
 │   ├── devices/          # Device listing & status
 │   ├── attendance/       # Retrieving scan logs
-│   ├── users/            # CRUD operations for employees
-│   ├── sync/             # Machine commands (Time sync, Restart)
-│   └── webhook/          # Real-time data processing
+│   ├── users/            # CRUD & Registration operations
+│   ├── sync/             # Machine maintenance (Time, Restart)
+│   └── webhook/          # Real-time data processing template
 │
-├── mini-demo-app/        # Integrated Attendance Monitoring Dashboard
-│   ├── index.php         # Main UI & Controller
-│   ├── config.php        # API Credentials
+├── mini-demo-app/        # Attendance Monitoring Dashboard
+│   ├── index.php         # Main Dashboard UI & Controller
+│   ├── config.php        # API Credentials Configuration
 │   ├── functions.php     # Reusable API wrapper functions
-│   └── assets/           # Optional styles/images
+│   └── assets/           # Dashboard Styles (CSS)
 │
-└── README.md             # Documentation
+└── README.md             # This documentation
 ```
 
-## Features Implemented
+## 🚀 Getting Started
 
-The following main features and endpoints have been implemented:
-
-1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
-
-## Requirements
-
+### Prerequisites
 - PHP 7.4 or higher
 - PHP cURL extension enabled
-- Valid Fingerspot API Token and Cloud ID
+- A valid Fingerspot API Token and Cloud ID
 
-## How to Use
+### 1. Using Sample Codes
+Each file in `sample-code/` is a self-contained script.
+1. Open the script (e.g., `sample-code/devices/get-devices.php`).
+2. Replace `YOUR_API_TOKEN_HERE` with your actual token.
+3. Run via CLI: `php get-devices.php` or via browser.
 
-### 1. Sample Codes
-Each file in the `sample-code/` directory is designed to be self-contained and beginner-friendly.
-1. Open the desired PHP file.
-2. Replace `YOUR_API_TOKEN_HERE` and `YOUR_CLOUD_ID_HERE` with your actual credentials.
-3. Run the script via terminal or browser:
-   ```bash
-   php sample-code/attendance/get-attendance.php
-   ```
-
-### 2. Mini Demo App
-The Attendance Monitoring Dashboard provides a visual way to interact with multiple features at once.
+### 2. Running the Mini Demo App
+The dashboard provides a visual interface for the API features.
 1. Configure your credentials in `mini-demo-app/config.php`.
-2. Host the folder on a PHP-enabled server (e.g., Apache, Nginx, or PHP Built-in server).
-3. Access `index.php` in your browser.
+2. Start a local server: `php -S localhost:8000 -t "mini-demo-app"`
+3. Open `http://localhost:8000` in your browser.
 
-## Important Notes
-- All API requests use **POST** and send data in **JSON** format.
-- A `trans_id` is required in most requests to track the communication.
-- Some commands are asynchronous; the result will be sent back via your configured **Webhook**.
+## 🛠️ Implementation Details
+- **Pure PHP & cURL**: No external frameworks or libraries were used.
+- **Security**: Basic XSS protection using `htmlspecialchars()` and professional coding standards.
+- **Asynchronous Logic**: Includes guidance on handling Webhooks for commands that the device processes asynchronously.
+
+---
+*Created as part of the Fingerspot Internship Project.*

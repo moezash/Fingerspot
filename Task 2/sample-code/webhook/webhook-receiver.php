@@ -5,6 +5,10 @@
  * This script demonstrates how to receive and process real-time data
  * sent by Fingerspot (e.g., attendance logs or command responses).
  *
+ * Requirements:
+ * - Pure PHP only
+ * - Beginner-friendly and professional
+ *
  * Note: Your server must be publicly accessible and the URL
  * configured in the Fingerspot Developer Dashboard.
  *
@@ -84,6 +88,7 @@ function processDeleteStatus($data) {
 
 /*
 Example Incoming Realtime Attlog:
+--------------------------------------------------
 {
     "type": "attlog",
     "cloud_id": "FTVXXXXXX",
@@ -96,6 +101,7 @@ Example Incoming Realtime Attlog:
 }
 
 Example Incoming Userinfo Response:
+--------------------------------------------------
 {
     "type": "get_userinfo",
     "cloud_id": "FTVXXXXXX",
@@ -110,6 +116,16 @@ Example Incoming Userinfo Response:
         "rfid": "",
         "template": "..."
     }
+}
+
+Example Response (Acknowledge):
+--------------------------------------------------
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+    "status": true,
+    "message": "Data received"
 }
 */
 ?>

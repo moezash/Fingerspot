@@ -5,6 +5,10 @@
  * This sample demonstrates how to request user data (names, templates, etc.)
  * from the attendance machine.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -17,7 +21,7 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_userinfo';
 $data = [
     'trans_id' => '1',
     'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN to retrieve. Leave empty or omit if supported to get all.
+    'pin'      => '101' // PIN to retrieve.
 ];
 
 // 3. Prepare Headers
@@ -53,6 +57,7 @@ if (curl_errno($ch)) {
         echo "Request successful. The machine will send the user data to your Webhook URL.\n";
     } else {
         echo "Failed to request data.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -60,8 +65,28 @@ if (curl_errno($ch)) {
 curl_close($ch);
 
 /*
-Note: Fingerspot API often works asynchronously for "Get Userinfo".
+Note: Fingerspot API works asynchronously for "Get Userinfo".
 The API call initiates the request, and the machine pushes the actual
 user data back to your server via the configured Webhook.
+
+Example Request:
+--------------------------------------------------
+POST /api/get_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success):
+--------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
 */
 ?>

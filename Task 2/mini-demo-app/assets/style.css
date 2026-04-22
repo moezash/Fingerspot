@@ -1,0 +1,11 @@
+body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.sidebar { height: 100vh; background: #2c3e50; color: white; padding-top: 20px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+.sidebar a { color: #bdc3c7; text-decoration: none; display: block; padding: 12px 20px; transition: 0.3s; }
+.sidebar a:hover, .sidebar a.active { color: white; background: #34495e; border-left: 4px solid #3498db; }
+.main-content { padding: 30px; }
+.card { border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 25px; }
+.card-header { background-color: #fff; border-bottom: 1px solid #edf2f7; font-weight: 600; padding: 15px 20px; }
+.table thead th { background-color: #f8fafc; border-bottom-width: 1px; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.025em; }
+.badge-online { background-color: #def7ec; color: #03543f; }
+.btn-primary { background-color: #3498db; border-color: #3498db; }
+.btn-primary:hover { background-color: #2980b9; border-color: #2980b9; }

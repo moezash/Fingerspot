@@ -5,6 +5,10 @@
  * This sample demonstrates how to set up the authentication headers
  * required for every request to the Fingerspot API.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -52,22 +56,30 @@ foreach ($headers as $header) {
 echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
 
 /*
-Example Request Headers:
-GET /api/get_device HTTP/1.1
+Example Request:
+--------------------------------------------------
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
 
-Example Response (if token is invalid):
+{
+    "trans_id": "1"
+}
+
+Example Response (Unauthorized):
+--------------------------------------------------
 {
     "status": false,
     "message": "Unauthorized"
 }
 
-Example Response (if token is valid):
+Example Response (Success):
+--------------------------------------------------
 {
     "status": true,
-    "data": [...]
+    "message": "Success",
+    "data": []
 }
 */
 ?>

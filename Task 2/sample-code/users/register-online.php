@@ -5,6 +5,10 @@
  * This sample demonstrates how to trigger the machine to start
  * a registration process for a specific user.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -39,6 +43,7 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 // 6. Execute Request
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 if (curl_errno($ch)) {
     echo 'Error: ' . curl_error($ch);
@@ -47,14 +52,39 @@ if (curl_errno($ch)) {
 
     echo "--- Register Online Sample ---\n";
     echo "Triggering registration for PIN " . $data['pin'] . " (Mode: " . $data['verification'] . ")\n";
+    echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Command successful. Machine is now in registration mode.\n";
     } else {
         echo "Failed to trigger registration.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
+
+/*
+Example Request:
+--------------------------------------------------
+POST /api/reg_online HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101",
+    "verification": "0"
+}
+
+Example Response (Success):
+--------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>

@@ -4,6 +4,10 @@
  *
  * This sample demonstrates how to delete an employee from the machine.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -37,6 +41,7 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 // 6. Execute Request
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 if (curl_errno($ch)) {
     echo 'Error: ' . curl_error($ch);
@@ -45,14 +50,38 @@ if (curl_errno($ch)) {
 
     echo "--- Delete User Sample ---\n";
     echo "Deleting PIN: " . $data['pin'] . "\n";
+    echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Delete command sent successfully.\n";
     } else {
         echo "Failed to send delete command.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
+
+/*
+Example Request:
+--------------------------------------------------
+POST /api/delete_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success):
+--------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>

@@ -5,6 +5,10 @@
  * This sample demonstrates how to retrieve attendance logs (scan data)
  * from a specific device within a date range.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -73,6 +77,7 @@ curl_close($ch);
 
 /*
 Example Request:
+--------------------------------------------------
 POST /api/get_attlog HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
@@ -86,6 +91,7 @@ Content-Type: application/json
 }
 
 Example Response (Success):
+--------------------------------------------------
 {
     "status": true,
     "message": "Success",
@@ -106,6 +112,7 @@ Example Response (Success):
 }
 
 Example Response (Error):
+--------------------------------------------------
 {
     "status": false,
     "message": "Invalid Cloud ID"

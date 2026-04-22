@@ -5,6 +5,10 @@
  * This sample demonstrates how to retrieve the list of devices
  * registered in your Fingerspot account.
  *
+ * Requirements:
+ * - Pure PHP + cURL only
+ * - Beginner-friendly and professional
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -27,7 +31,7 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 // Using POST as per Fingerspot API convention for most endpoints
 curl_setopt($ch, CURLOPT_POST, true);
-// Even for listing, a trans_id is often recommended
+// A trans_id is required for tracking the request
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
     'trans_id' => '1'
 ]));
@@ -49,10 +53,11 @@ if (curl_errno($ch)) {
     if ($result && isset($result['status']) && $result['status']) {
         echo "Devices found:\n";
         foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . " | Status: " . ($device['status'] ?? 'Unknown') . "\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -61,6 +66,7 @@ curl_close($ch);
 
 /*
 Example Request:
+--------------------------------------------------
 POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
@@ -71,6 +77,7 @@ Content-Type: application/json
 }
 
 Example Response (Success):
+--------------------------------------------------
 {
     "status": true,
     "message": "Success",
@@ -88,7 +95,8 @@ Example Response (Success):
     ]
 }
 
-Example Response (Unauthorized):
+Example Response (Error):
+--------------------------------------------------
 {
     "status": false,
     "message": "Unauthorized"
