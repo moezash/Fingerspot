@@ -4,6 +4,10 @@
  *
  * This sample demonstrates how to delete an employee from the machine.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token and Cloud ID from Fingerspot
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -37,17 +41,22 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 // 6. Execute Request
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// 7. Check for errors
 if (curl_errno($ch)) {
     echo 'Error: ' . curl_error($ch);
 } else {
+    // 8. Process Response
     $result = json_decode($response, true);
 
     echo "--- Delete User Sample ---\n";
-    echo "Deleting PIN: " . $data['pin'] . "\n";
+    echo "Deleting PIN: " . $data['pin'] . " from Device: $cloudId\n";
+    echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Delete command sent successfully.\n";
+        echo "Note: The machine will process this command and report the result via Webhook.\n";
     } else {
         echo "Failed to send delete command.\n";
         echo "Response: " . $response . "\n";
@@ -55,4 +64,23 @@ if (curl_errno($ch)) {
 }
 
 curl_close($ch);
+
+/*
+---------------------------------------------------------------------------
+EXAMPLE REQUEST BODY
+---------------------------------------------------------------------------
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456789",
+    "pin": "101"
+}
+
+---------------------------------------------------------------------------
+EXAMPLE RESPONSE (SUCCESS)
+---------------------------------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>

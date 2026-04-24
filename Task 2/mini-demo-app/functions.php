@@ -14,7 +14,7 @@ require_once 'config.php';
 function fingerspot_request($endpoint, $data = []) {
     $url = API_URL . '/' . $endpoint;
 
-    // Ensure trans_id is present
+    // Ensure trans_id is present for tracking
     if (!isset($data['trans_id'])) {
         $data['trans_id'] = (string)time();
     }
@@ -34,6 +34,7 @@ function fingerspot_request($endpoint, $data = []) {
 
     $response = curl_exec($ch);
     $error = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     if ($error) {
@@ -42,7 +43,7 @@ function fingerspot_request($endpoint, $data = []) {
 
     $decoded = json_decode($response, true);
     if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+        return ['status' => false, 'message' => "Invalid JSON response (HTTP $httpCode): $response"];
     }
 
     return $decoded;
@@ -50,6 +51,7 @@ function fingerspot_request($endpoint, $data = []) {
 
 /**
  * Get the list of devices
+ * Endpoint: /api/get_device
  */
 function get_devices() {
     return fingerspot_request('get_device');
@@ -57,6 +59,7 @@ function get_devices() {
 
 /**
  * Get attendance logs for a device
+ * Endpoint: /api/get_attlog
  */
 function get_attendance($cloud_id, $start_date, $end_date) {
     return fingerspot_request('get_attlog', [
@@ -68,6 +71,7 @@ function get_attendance($cloud_id, $start_date, $end_date) {
 
 /**
  * Add a new employee to a device
+ * Endpoint: /api/set_userinfo
  */
 function add_employee($cloud_id, $pin, $name) {
     return fingerspot_request('set_userinfo', [
@@ -80,6 +84,7 @@ function add_employee($cloud_id, $pin, $name) {
 
 /**
  * Delete an employee from a device
+ * Endpoint: /api/delete_userinfo
  */
 function delete_employee($cloud_id, $pin) {
     return fingerspot_request('delete_userinfo', [
@@ -90,9 +95,20 @@ function delete_employee($cloud_id, $pin) {
 
 /**
  * Sync device time
+ * Endpoint: /api/set_time
  */
 function sync_time($cloud_id) {
     return fingerspot_request('set_time', [
+        'cloud_id' => $cloud_id
+    ]);
+}
+
+/**
+ * Restart device
+ * Endpoint: /api/restart
+ */
+function restart_device($cloud_id) {
+    return fingerspot_request('restart', [
         'cloud_id' => $cloud_id
     ]);
 }

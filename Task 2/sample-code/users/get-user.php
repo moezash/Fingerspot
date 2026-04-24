@@ -5,6 +5,10 @@
  * This sample demonstrates how to request user data (names, templates, etc.)
  * from the attendance machine.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token and Cloud ID from Fingerspot
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -17,7 +21,7 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_userinfo';
 $data = [
     'trans_id' => '1',
     'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN to retrieve. Leave empty or omit if supported to get all.
+    'pin'      => '101' // PIN of the employee to retrieve.
 ];
 
 // 3. Prepare Headers
@@ -40,9 +44,11 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// 7. Check for errors
 if (curl_errno($ch)) {
     echo 'Error: ' . curl_error($ch);
 } else {
+    // 8. Process Response
     $result = json_decode($response, true);
 
     echo "--- Get User Information Sample ---\n";
@@ -50,7 +56,8 @@ if (curl_errno($ch)) {
     echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
-        echo "Request successful. The machine will send the user data to your Webhook URL.\n";
+        echo "Request successful. The command has been sent to the machine.\n";
+        echo "Note: The machine will send the user data to your Webhook URL asynchronously.\n";
     } else {
         echo "Failed to request data.\n";
         echo "Response: " . $response . "\n";
@@ -60,8 +67,29 @@ if (curl_errno($ch)) {
 curl_close($ch);
 
 /*
-Note: Fingerspot API often works asynchronously for "Get Userinfo".
+---------------------------------------------------------------------------
+IMPORTANT NOTE
+---------------------------------------------------------------------------
+Fingerspot API works asynchronously for "Get Userinfo".
 The API call initiates the request, and the machine pushes the actual
-user data back to your server via the configured Webhook.
+user data (name, templates, etc.) back to your server via the
+configured Webhook URL.
+
+---------------------------------------------------------------------------
+EXAMPLE REQUEST BODY
+---------------------------------------------------------------------------
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456789",
+    "pin": "101"
+}
+
+---------------------------------------------------------------------------
+EXAMPLE RESPONSE (SUCCESS)
+---------------------------------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
 */
 ?>

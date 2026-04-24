@@ -5,6 +5,10 @@
  * This sample demonstrates how to send employee data to the
  * attendance machine.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token and Cloud ID from Fingerspot
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -70,10 +74,12 @@ if (curl_errno($ch)) {
 curl_close($ch);
 
 /*
-Example Request Body:
+---------------------------------------------------------------------------
+EXAMPLE REQUEST BODY
+---------------------------------------------------------------------------
 {
     "trans_id": "1",
-    "cloud_id": "FTV123456",
+    "cloud_id": "FTV123456789",
     "pin": "101",
     "name": "John Doe",
     "privilege": "0",
@@ -81,7 +87,9 @@ Example Request Body:
     "rfid": ""
 }
 
-Example Response (Success):
+---------------------------------------------------------------------------
+EXAMPLE RESPONSE (SUCCESS)
+---------------------------------------------------------------------------
 {
     "status": true,
     "message": "Success"

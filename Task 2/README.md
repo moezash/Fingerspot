@@ -23,9 +23,22 @@ Task 2/
 └── README.md             # Documentation
 ```
 
+## Main Endpoints
+
+Based on the official documentation, the following endpoints are used:
+
+- `POST /api/get_device`: Retrieve the list of all registered attendance machines.
+- `POST /api/get_attlog`: Fetch attendance scan logs with date filtering.
+- `POST /api/set_userinfo`: Add or update employee information on a specific device.
+- `POST /api/get_userinfo`: Request user information from a machine (response sent via Webhook).
+- `POST /api/delete_userinfo`: Delete an employee from a specific attendance machine.
+- `POST /api/reg_online`: Remotely trigger online registration mode on the device.
+- `POST /api/set_time`: Synchronize the attendance machine's time with the server.
+- `POST /api/restart`: Remotely restart the attendance machine.
+
 ## Features Implemented
 
-The following main features and endpoints have been implemented:
+The following main features and endpoints have been implemented in this project:
 
 1.  **Authentication**: Bearer token implementation required for all requests.
 2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
