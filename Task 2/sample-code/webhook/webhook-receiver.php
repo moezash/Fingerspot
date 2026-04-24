@@ -5,111 +5,142 @@
  * This script demonstrates how to receive and process real-time data
  * sent by Fingerspot (e.g., attendance logs or command responses).
  *
- * Note: Your server must be publicly accessible and the URL
- * configured in the Fingerspot Developer Dashboard.
+ * Instructions:
+ * 1. Host this script on a publicly accessible URL (e.g., https://yourdomain.com/webhook.php).
+ * 2. Register this URL in your Fingerspot Developer Dashboard.
  *
  * Documentation: https://developer.fingerspot.io
  */
 
 // 1. Get the raw POST data from the request body
+// Fingerspot sends data as a JSON object in the body of a POST request.
 $json = file_get_contents('php://input');
 
-// 2. Decode the JSON data
+// 2. Decode the JSON data into an associative array
 $data = json_decode($json, true);
 
-// 3. Check if data was received
+// 3. Process the incoming data
 if ($data) {
-    // Log the data for debugging (optional)
-    file_put_contents('webhook_log.txt', date('Y-m-d H:i:s') . " - " . $json . PHP_EOL, FILE_APPEND);
+    /**
+     * Optional: Log the incoming data for debugging.
+     * Ensure the 'logs' directory exists and is writable.
+     */
+    // file_put_contents('webhook_incoming.log', date('Y-m-d H:i:s') . " - " . $json . PHP_EOL, FILE_APPEND);
 
-    // 4. Process based on the type of data
-    // Fingerspot often includes a "type" or checks for specific fields
+    // Identify the type of event/data
+    $type = $data['type'] ?? '';
+    $cloudId = $data['cloud_id'] ?? 'Unknown';
 
-    if (isset($data['type'])) {
-        switch ($data['type']) {
-            case 'attlog':
-                // Realtime attendance scan
-                processAttendance($data);
-                break;
+    switch ($type) {
+        case 'attlog':
+            /**
+             * Real-time attendance scan.
+             * Triggered whenever someone scans their finger/face on the device.
+             */
+            processAttendance($cloudId, $data['data']);
+            break;
 
-            case 'get_userinfo':
-                // Response from a Get Userinfo request
-                processUserInfo($data);
-                break;
+        case 'get_userinfo':
+            /**
+             * Response to a 'get_userinfo' command.
+             * Contains the requested user details and templates.
+             */
+            processUserInfo($cloudId, $data['data']);
+            break;
 
-            case 'reg_online':
-                // Result of a registration process
-                processRegistration($data);
-                break;
+        case 'reg_online':
+            /**
+             * Result of a remote registration process.
+             */
+            processRegistrationResult($cloudId, $data['data']);
+            break;
 
-            case 'delete_userinfo':
-                // Result of a delete process
-                processDeleteStatus($data);
-                break;
-        }
+        case 'delete_userinfo':
+            /**
+             * Result of a delete user command.
+             */
+            processDeleteResult($cloudId, $data);
+            break;
+
+        default:
+            // Unknown or unhandled type
+            break;
     }
 
-    // 5. Always respond with a 200 OK to acknowledge receipt
+    // 4. Always respond with a 200 OK to acknowledge receipt.
+    // If you don't respond with 200, Fingerspot may attempt to resend the data.
     http_response_code(200);
-    echo json_encode(["status" => true, "message" => "Data received"]);
+    header('Content-Type: application/json');
+    echo json_encode(["status" => true, "message" => "Webhook received successfully"]);
+
 } else {
-    // No data received
+    // No valid data received
     http_response_code(400);
-    echo json_encode(["status" => false, "message" => "No data received"]);
+    echo json_encode(["status" => false, "message" => "Invalid or empty payload"]);
 }
 
 /**
- * Example function to process attendance logs
+ * Handle real-time attendance logs
  */
-function processAttendance($data) {
-    $pin = $data['data']['pin'] ?? 'Unknown';
-    $time = $data['data']['scan'] ?? 'Unknown';
-    $cloudId = $data['cloud_id'] ?? 'Unknown';
+function processAttendance($cloudId, $log) {
+    $pin = $log['pin'] ?? '';
+    $scanTime = $log['scan'] ?? '';
+    $status = $log['status_scan'] ?? '';
 
-    // Log to a file or database
-    // error_log("Attendance: User $pin scanned at $time on device $cloudId");
+    // Logic: Save to database, send notification, etc.
+    // Example: error_log("Device $cloudId: User $pin scanned at $scanTime");
 }
 
-function processUserInfo($data) {
-    // Handle user data received from machine
+/**
+ * Handle incoming user information
+ */
+function processUserInfo($cloudId, $userInfo) {
+    $pin = $userInfo['pin'] ?? '';
+    $name = $userInfo['name'] ?? '';
+    // $template = $userInfo['template'] ?? '';
+
+    // Logic: Update local user record or store templates
 }
 
-function processRegistration($data) {
-    // Handle registration result
+/**
+ * Handle registration result
+ */
+function processRegistrationResult($cloudId, $regData) {
+    // Logic: Confirm user was registered successfully
 }
 
-function processDeleteStatus($data) {
-    // Handle delete result
+/**
+ * Handle delete result
+ */
+function processDeleteResult($cloudId, $result) {
+    // Logic: Verify deletion success
 }
 
 /*
-Example Incoming Realtime Attlog:
+---------------------------------------------------------------------------
+Example Incoming Real-time Attlog (JSON):
+---------------------------------------------------------------------------
 {
     "type": "attlog",
-    "cloud_id": "FTVXXXXXX",
+    "cloud_id": "FTV123456",
     "data": {
-        "pin": "1",
-        "scan": "2024-01-21 10:11:00",
+        "pin": "101",
+        "scan": "2024-01-21 10:15:00",
         "verify": "1",
         "status_scan": "0"
     }
 }
 
-Example Incoming Userinfo Response:
+---------------------------------------------------------------------------
+Example Response from your Server:
+---------------------------------------------------------------------------
+HTTP/1.1 200 OK
+Content-Type: application/json
+
 {
-    "type": "get_userinfo",
-    "cloud_id": "FTVXXXXXX",
-    "trans_id": "1",
-    "data": {
-        "pin": "1",
-        "name": "Budi",
-        "privilege": "0",
-        "finger": "1",
-        "face": "0",
-        "password": "111",
-        "rfid": "",
-        "template": "..."
-    }
+    "status": true,
+    "message": "Webhook received successfully"
 }
+---------------------------------------------------------------------------
 */
 ?>
