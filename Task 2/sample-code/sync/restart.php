@@ -2,6 +2,14 @@
 /**
  * Sample code for Restarting Machine Remotely
  *
+ * This sample demonstrates how to restart the attendance machine
+ * system remotely via the API.
+ *
+ * Requirements:
+ * - PHP cURL extension
+ * - API Token from Fingerspot Developer Dashboard
+ * - Cloud ID (Serial Number) of the device
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -12,11 +20,11 @@ $apiUrl   = 'https://developer.fingerspot.io/api/restart';
 
 // 2. Prepare Data
 $data = [
-    'trans_id' => '1',
-    'cloud_id' => $cloudId
+    'trans_id' => '1',      // Unique ID for this request
+    'cloud_id' => $cloudId  // Device Cloud ID
 ];
 
-// 3. Headers
+// 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
     'Content-Type: application/json'
@@ -25,26 +33,68 @@ $headers = [
 // 4. Initialize cURL
 $ch = curl_init($apiUrl);
 
+// 5. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
+// 6. Execute Request
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
+    // 8. Process Response
     $result = json_decode($response, true);
+
     echo "--- Restart Machine Sample ---\n";
+    echo "Sending restart command to device: " . $cloudId . "\n";
+    echo "HTTP Status Code: $httpCode\n\n";
+
     if ($result && isset($result['status']) && $result['status']) {
         echo "Restart command sent successfully.\n";
+        echo "Note: The machine will reboot shortly.\n";
     } else {
         echo "Failed to send restart command.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
+
+/*
+---------------------------------------------------------------------------
+Example Request:
+---------------------------------------------------------------------------
+POST /api/restart HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456"
+}
+
+---------------------------------------------------------------------------
+Example Response (Success):
+---------------------------------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
+
+---------------------------------------------------------------------------
+Example Response (Error):
+---------------------------------------------------------------------------
+{
+    "status": false,
+    "message": "Device Offline"
+}
+*/
 ?>

@@ -3,7 +3,12 @@
  * Sample code for Getting User Information from Fingerspot Device
  *
  * This sample demonstrates how to request user data (names, templates, etc.)
- * from the attendance machine.
+ * from the attendance machine remotely.
+ *
+ * Requirements:
+ * - PHP cURL extension
+ * - API Token from Fingerspot Developer Dashboard
+ * - Cloud ID (Serial Number) of the device
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -15,9 +20,9 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_userinfo';
 
 // 2. Prepare Data
 $data = [
-    'trans_id' => '1',
-    'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN to retrieve. Leave empty or omit if supported to get all.
+    'trans_id' => '1',            // Unique ID for this request
+    'cloud_id' => $cloudId,       // Device Cloud ID
+    'pin'      => '101'           // PIN to retrieve
 ];
 
 // 3. Prepare Headers
@@ -40,28 +45,74 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
+    // 8. Process Response
     $result = json_decode($response, true);
 
     echo "--- Get User Information Sample ---\n";
-    echo "Requesting data for PIN: " . $data['pin'] . "\n";
+    echo "Requesting data for PIN: " . $data['pin'] . " on device " . $cloudId . "\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
-        echo "Request successful. The machine will send the user data to your Webhook URL.\n";
+        echo "Request sent successfully.\n";
+        echo "IMPORTANT: Fingerspot API works asynchronously for 'Get Userinfo'.\n";
+        echo "The machine will push the actual user data to your configured Webhook URL.\n";
     } else {
         echo "Failed to request data.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
 
 /*
-Note: Fingerspot API often works asynchronously for "Get Userinfo".
-The API call initiates the request, and the machine pushes the actual
-user data back to your server via the configured Webhook.
+---------------------------------------------------------------------------
+Example Request:
+---------------------------------------------------------------------------
+POST /api/get_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+---------------------------------------------------------------------------
+Example Response (Command Accepted):
+---------------------------------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
+
+---------------------------------------------------------------------------
+Example Webhook Payload (Data pushed to your server later):
+---------------------------------------------------------------------------
+{
+    "type": "get_userinfo",
+    "cloud_id": "FTV123456",
+    "trans_id": "1",
+    "data": {
+        "pin": "101",
+        "name": "John Doe",
+        "privilege": "0",
+        "password": "",
+        "rfid": "",
+        "template": [
+            {
+                "index": "0",
+                "type": "finger",
+                "data": "HEX_OR_BASE64_DATA..."
+            }
+        ]
+    }
+}
 */
 ?>

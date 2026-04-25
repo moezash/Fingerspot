@@ -5,6 +5,11 @@
  * This sample demonstrates how to send employee data to the
  * attendance machine.
  *
+ * Requirements:
+ * - PHP cURL extension
+ * - API Token from Fingerspot Developer Dashboard
+ * - Cloud ID (Serial Number) of the device
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -17,12 +22,12 @@ $apiUrl   = 'https://developer.fingerspot.io/api/set_userinfo';
 $data = [
     'trans_id'  => '1',            // Unique ID for this request
     'cloud_id'  => $cloudId,       // Device Cloud ID
-    'pin'       => '101',          // Employee PIN / ID
-    'name'      => 'John Doe',     // Employee Name
-    'privilege' => '0',            // 0: User, 1: Admin
-    'password'  => '',             // Device password (optional)
+    'pin'       => '101',          // Employee PIN / ID (Numeric string)
+    'name'      => 'John Doe',     // Employee Name (Max 24 chars)
+    'privilege' => '0',            // 0: Normal User, 1: Administrator
+    'password'  => '',             // Device login password (optional)
     'rfid'      => '',             // RFID Card ID (optional)
-    // Templates can be sent here as well if you have the hex/base64 data
+    // Optional: Template data for biometrics (Finger/Face/Vein)
     // 'finger_data' => '...',
     // 'face_data'   => '...'
 ];
@@ -49,7 +54,7 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 // 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
     // 8. Process Response
     $result = json_decode($response, true);
@@ -60,17 +65,26 @@ if (curl_errno($ch)) {
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Command sent successfully to the machine.\n";
-        echo "Note: The machine will process this command and report the result via Webhook.\n";
+        echo "Note: The machine will process this command asynchronously. \n";
+        echo "The final result will be reported to your configured Webhook.\n";
     } else {
         echo "Failed to send command.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
 
 /*
-Example Request Body:
+---------------------------------------------------------------------------
+Example Request:
+---------------------------------------------------------------------------
+POST /api/set_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
 {
     "trans_id": "1",
     "cloud_id": "FTV123456",
@@ -81,10 +95,20 @@ Example Request Body:
     "rfid": ""
 }
 
+---------------------------------------------------------------------------
 Example Response (Success):
+---------------------------------------------------------------------------
 {
     "status": true,
     "message": "Success"
+}
+
+---------------------------------------------------------------------------
+Example Response (Error - Device Offline):
+---------------------------------------------------------------------------
+{
+    "status": false,
+    "message": "Device Offline"
 }
 */
 ?>
