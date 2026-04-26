@@ -1,0 +1,10 @@
+Main Fingerspot API Endpoints:
+- /api/get_device      : Retrieve list of devices
+- /api/get_attlog      : Retrieve attendance logs (scan data)
+- /api/set_userinfo    : Add or update user information on device
+- /api/get_userinfo    : Request user information from device
+- /api/delete_userinfo : Remove user from device
+- /api/reg_online      : Remote user registration
+- /api/set_time        : Synchronize machine time
+- /api/restart         : Remote machine restart
+- Webhook              : Receive real-time data and async command results

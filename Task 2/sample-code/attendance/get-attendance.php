@@ -3,7 +3,12 @@
  * Sample code for Get Attendance Logs from Fingerspot API
  *
  * This sample demonstrates how to retrieve attendance logs (scan data)
- * from a specific device within a date range.
+ * from a specific device within a date range using pure PHP and cURL.
+ *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token from Fingerspot Developer Dashboard
+ * - Valid Cloud ID of your device
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -57,7 +62,7 @@ if (curl_errno($ch)) {
         echo "Logs retrieved successfully:\n";
         if (isset($result['data']) && !empty($result['data'])) {
             foreach ($result['data'] as $log) {
-                echo "- PIN: " . $log['pin'] . " | Time: " . $log['scan'] . " | Status: " . $log['status_scan'] . "\n";
+                echo "- PIN: " . ($log['pin'] ?? 'N/A') . " | Time: " . ($log['scan'] ?? 'N/A') . " | Status: " . ($log['status_scan'] ?? 'N/A') . "\n";
             }
         } else {
             echo "No logs found for the selected period.\n";
@@ -72,12 +77,7 @@ if (curl_errno($ch)) {
 curl_close($ch);
 
 /*
-Example Request:
-POST /api/get_attlog HTTP/1.1
-Host: developer.fingerspot.io
-Authorization: Bearer YOUR_API_TOKEN_HERE
-Content-Type: application/json
-
+Example Request Body:
 {
     "trans_id": "1",
     "cloud_id": "FTV123456",

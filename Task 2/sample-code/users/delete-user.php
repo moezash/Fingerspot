@@ -55,4 +55,19 @@ if (curl_errno($ch)) {
 }
 
 curl_close($ch);
+
+/*
+Example Request Body:
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success):
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>

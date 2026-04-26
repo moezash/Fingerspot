@@ -3,7 +3,11 @@
  * Sample code for Authentication with Fingerspot API
  *
  * This sample demonstrates how to set up the authentication headers
- * required for every request to the Fingerspot API.
+ * required for every request to the Fingerspot API using pure PHP and cURL.
+ *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token from Fingerspot Developer Dashboard
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -14,6 +18,7 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 
 // 2. Prepare Headers
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
+// and the Content-Type must be set to application/json
 $headers = [
     'Authorization: Bearer ' . $apiToken,
     'Content-Type: application/json'
@@ -21,6 +26,10 @@ $headers = [
 
 /**
  * Helper function to demonstrate how headers are used in a cURL request
+ *
+ * @param string $url The endpoint URL
+ * @param array $headers The array of HTTP headers
+ * @return array The response status code and body
  */
 function testAuthentication($url, $headers) {
     $ch = curl_init($url);
