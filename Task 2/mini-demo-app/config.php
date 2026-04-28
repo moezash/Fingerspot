@@ -3,7 +3,6 @@
  * Configuration file for Fingerspot Mini Demo App
  */
 
-// API Credentials
 // Replace with your actual Fingerspot API Token
 define('API_TOKEN', 'YOUR_API_TOKEN_HERE');
 
@@ -11,7 +10,7 @@ define('API_TOKEN', 'YOUR_API_TOKEN_HERE');
 define('API_URL', 'https://developer.fingerspot.io/api');
 
 // App Settings
-define('APP_NAME', 'Attendance Monitor');
+define('APP_NAME', 'Fingerspot Attendance Dashboard');
 
 // Error reporting
 error_reporting(E_ALL);

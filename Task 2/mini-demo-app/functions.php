@@ -6,10 +6,6 @@ require_once 'config.php';
 
 /**
  * Send a POST request to the Fingerspot API
- *
- * @param string $endpoint The API endpoint (e.g., 'get_device')
- * @param array $data The data to send in the request body
- * @return array The decoded JSON response
  */
 function fingerspot_request($endpoint, $data = []) {
     $url = API_URL . '/' . $endpoint;
@@ -42,7 +38,7 @@ function fingerspot_request($endpoint, $data = []) {
 
     $decoded = json_decode($response, true);
     if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+        return ['status' => false, 'message' => "Invalid JSON response"];
     }
 
     return $decoded;
