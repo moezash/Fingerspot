@@ -15,7 +15,8 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_device'; // Endpoint to get
 // 2. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 3. Initialize cURL
@@ -29,7 +30,7 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_POST, true);
 // Even for listing, a trans_id is often recommended
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'trans_id' => '1'
+    'trans_id' => (string)time()
 ]));
 
 // 5. Execute Request
@@ -48,11 +49,16 @@ if (curl_errno($ch)) {
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Devices found:\n";
-        foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+        if (isset($result['data']) && is_array($result['data'])) {
+            foreach ($result['data'] as $device) {
+                echo "- SN: " . ($device['cloud_id'] ?? 'N/A') . " | Name: " . ($device['name'] ?? 'N/A') . "\n";
+            }
+        } else {
+            echo "No device data available.\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
+        echo "Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -65,9 +71,10 @@ POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1"
+    "trans_id": "1714489200"
 }
 
 Example Response (Success):

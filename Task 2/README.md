@@ -23,19 +23,29 @@ Task 2/
 └── README.md             # Documentation
 ```
 
+## Main Endpoints & Features
+
+The following primary endpoints from developer.fingerspot.io are implemented in this project:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/get_device` | POST | Retrieve a list of all devices registered in the account. |
+| `/api/get_attlog` | POST | Fetch attendance scan logs for a specific device and date range. |
+| `/api/set_userinfo` | POST | Add or update employee information on the device. |
+| `/api/get_userinfo` | POST | Request detailed user info from the device (returns data via Webhook). |
+| `/api/delete_userinfo` | POST | Remotely delete an employee from the device. |
+| `/api/reg_online` | POST | Trigger remote registration mode on the device for a specific PIN. |
+| `/api/set_time` | POST | Synchronize the device's time and timezone. |
+| `/api/restart` | POST | Remotely restart the device system. |
+
 ## Features Implemented
 
-The following main features and endpoints have been implemented:
-
 1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+2.  **Device Management**: Listing and checking status of all connected machines.
+3.  **Attendance Monitoring**: Retrieving logs for reporting or dashboarding.
+4.  **User Management**: CRUD operations for employees on the device.
+5.  **Device Control**: Remote commands for syncing time and restarting machines.
+6.  **Real-time Processing**: Webhook implementation for handling asynchronous data.
 
 ## Requirements
 
