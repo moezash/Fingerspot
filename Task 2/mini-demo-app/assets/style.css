@@ -1,0 +1,70 @@
+/* Mini Demo App Custom Styles */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar {
+    height: 100vh;
+    background: #2c3e50;
+    color: white;
+    padding-top: 20px;
+    position: fixed;
+}
+
+.sidebar h4 {
+    color: #ecf0f1;
+    font-weight: bold;
+    border-bottom: 1px solid #34495e;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.sidebar a {
+    color: #bdc3c7;
+    text-decoration: none;
+    display: block;
+    padding: 12px 20px;
+    transition: all 0.3s;
+}
+
+.sidebar a:hover, .sidebar a.active {
+    color: white;
+    background: #34495e;
+    border-left: 4px solid #3498db;
+}
+
+.main-content {
+    margin-left: 16.666667%; /* Offset for col-md-2 */
+    padding: 30px;
+}
+
+.card {
+    margin-bottom: 25px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.card-header {
+    background-color: white;
+    font-weight: bold;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.badge-online {
+    background-color: #2ecc71;
+}
+
+.badge-offline {
+    background-color: #e74c3c;
+}
+
+.table thead th {
+    border-top: none;
+    background-color: #fcfcfc;
+    color: #7f8c8d;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}

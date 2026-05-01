@@ -47,16 +47,8 @@ if ($selected_device) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo APP_NAME; ?></title>
-    <!-- Simple CSS for the dashboard -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { height: 100vh; background: #343a40; color: white; padding-top: 20px; }
-        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 10px 20px; }
-        .sidebar a:hover, .sidebar a.active { color: white; background: #495057; }
-        .main-content { padding: 20px; }
-        .card { margin-bottom: 20px; border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
-    </style>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -70,7 +62,7 @@ if ($selected_device) {
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-10 main-content">
+            <div class="col-md-10 main-content offset-md-2">
                 <?php if ($message): ?>
                     <div class="alert alert-<?php echo $message_type; ?> alert-dismissible fade show" role="alert">
                         <?php echo htmlspecialchars($message); ?>

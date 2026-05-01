@@ -5,6 +5,14 @@
  * This sample demonstrates how to request user data (names, templates, etc.)
  * from the attendance machine.
  *
+ * Note: This command is ASYNCHRONOUS. The API call only triggers the request.
+ * The machine will send the actual user data to your Webhook URL.
+ *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token and Cloud ID from developer.fingerspot.io
+ * - A configured Webhook URL in your developer dashboard
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -15,15 +23,16 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_userinfo';
 
 // 2. Prepare Data
 $data = [
-    'trans_id' => '1',
+    'trans_id' => (string)time(),
     'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN to retrieve. Leave empty or omit if supported to get all.
+    'pin'      => '101' // PIN to retrieve.
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -46,22 +55,59 @@ if (curl_errno($ch)) {
     $result = json_decode($response, true);
 
     echo "--- Get User Information Sample ---\n";
-    echo "Requesting data for PIN: " . $data['pin'] . "\n";
+    echo "Endpoint: $apiUrl\n";
+    echo "Requesting data for PIN: " . $data['pin'] . " on Device: $cloudId\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
-        echo "Request successful. The machine will send the user data to your Webhook URL.\n";
+        echo "Request successful. The command has been queued.\n";
+        echo "The machine will send the user data to your Webhook URL shortly.\n";
     } else {
         echo "Failed to request data.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
 
 /*
-Note: Fingerspot API often works asynchronously for "Get Userinfo".
-The API call initiates the request, and the machine pushes the actual
-user data back to your server via the configured Webhook.
+Example Request:
+POST /api/get_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1705824000",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success - Command Queued):
+{
+    "status": true,
+    "message": "Success"
+}
+
+Example Webhook Data (sent to your server later):
+{
+    "type": "get_userinfo",
+    "cloud_id": "FTV123456",
+    "trans_id": "1705824000",
+    "data": {
+        "pin": "101",
+        "name": "John Doe",
+        "privilege": "0",
+        "password": "",
+        "rfid": "",
+        "finger": "2",
+        "face": "1",
+        "template": [
+            {"index": 0, "type": "finger", "data": "..."},
+            {"index": 1, "type": "face", "data": "..."}
+        ]
+    }
+}
 */
 ?>

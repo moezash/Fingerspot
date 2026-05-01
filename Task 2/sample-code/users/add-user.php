@@ -5,6 +5,10 @@
  * This sample demonstrates how to send employee data to the
  * attendance machine.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token and Cloud ID from developer.fingerspot.io
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -15,22 +19,26 @@ $apiUrl   = 'https://developer.fingerspot.io/api/set_userinfo';
 
 // 2. Prepare User Data
 $data = [
-    'trans_id'  => '1',            // Unique ID for this request
+    'trans_id'  => (string)time(), // Unique ID for this request
     'cloud_id'  => $cloudId,       // Device Cloud ID
-    'pin'       => '101',          // Employee PIN / ID
-    'name'      => 'John Doe',     // Employee Name
-    'privilege' => '0',            // 0: User, 1: Admin
-    'password'  => '',             // Device password (optional)
-    'rfid'      => '',             // RFID Card ID (optional)
+    'pin'       => '101',          // Employee PIN / ID (max 9 digits usually)
+    'name'      => 'John Doe',     // Employee Name (max 24 characters usually)
+    'privilege' => '0',            // 0: Normal User, 1: Administrator
+    'password'  => '',             // Device password (optional, max 6 digits)
+    'rfid'      => '',             // RFID Card ID (optional, 10 digits hex or decimal)
     // Templates can be sent here as well if you have the hex/base64 data
-    // 'finger_data' => '...',
+    // 'finger_data' => [
+    //     ['index' => 0, 'template' => '...'],
+    //     ['index' => 1, 'template' => '...']
+    // ],
     // 'face_data'   => '...'
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -55,15 +63,18 @@ if (curl_errno($ch)) {
     $result = json_decode($response, true);
 
     echo "--- Add/Set User Information Sample ---\n";
+    echo "Endpoint: $apiUrl\n";
     echo "Sending data for PIN: " . $data['pin'] . " (" . $data['name'] . ")\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
-        echo "Command sent successfully to the machine.\n";
-        echo "Note: The machine will process this command and report the result via Webhook.\n";
+        echo "Command sent successfully to the cloud.\n";
+        echo "The machine will receive and process this command shortly.\n";
+        echo "Result of execution on the machine will be sent to your Webhook.\n";
     } else {
         echo "Failed to send command.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
@@ -72,7 +83,7 @@ curl_close($ch);
 /*
 Example Request Body:
 {
-    "trans_id": "1",
+    "trans_id": "1705824000",
     "cloud_id": "FTV123456",
     "pin": "101",
     "name": "John Doe",

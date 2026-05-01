@@ -32,6 +32,11 @@ function fingerspot_request($endpoint, $data = []) {
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
+    if (API_TOKEN === 'YOUR_API_TOKEN_HERE') {
+        // Return mock data for testing/verification purposes
+        return get_mock_response($endpoint, $data);
+    }
+
     $response = curl_exec($ch);
     $error = curl_error($ch);
     curl_close($ch);
@@ -95,5 +100,38 @@ function sync_time($cloud_id) {
     return fingerspot_request('set_time', [
         'cloud_id' => $cloud_id
     ]);
+}
+
+/**
+ * Mock responses for verification
+ */
+function get_mock_response($endpoint, $data) {
+    switch ($endpoint) {
+        case 'get_device':
+            return [
+                'status' => true,
+                'message' => 'Success',
+                'data' => [
+                    ['cloud_id' => 'DEV001', 'name' => 'Main Office'],
+                    ['cloud_id' => 'DEV002', 'name' => 'Warehouse']
+                ]
+            ];
+        case 'get_attlog':
+            return [
+                'status' => true,
+                'message' => 'Success',
+                'data' => [
+                    ['pin' => '1', 'scan' => date('Y-m-d') . ' 08:00:00', 'status_scan' => '0', 'verify' => '1'],
+                    ['pin' => '2', 'scan' => date('Y-m-d') . ' 08:05:00', 'status_scan' => '0', 'verify' => '1'],
+                    ['pin' => '1', 'scan' => date('Y-m-d') . ' 17:00:00', 'status_scan' => '1', 'verify' => '1']
+                ]
+            ];
+        case 'set_userinfo':
+        case 'delete_userinfo':
+        case 'set_time':
+            return ['status' => true, 'message' => 'Mock Success'];
+        default:
+            return ['status' => false, 'message' => 'Unknown endpoint'];
+    }
 }
 ?>

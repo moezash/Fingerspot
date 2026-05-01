@@ -5,6 +5,10 @@
  * This sample demonstrates how to retrieve attendance logs (scan data)
  * from a specific device within a date range.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token and Cloud ID from developer.fingerspot.io
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -13,9 +17,9 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 $cloudId  = 'YOUR_CLOUD_ID_HERE'; // The ID of your attendance machine
 $apiUrl   = 'https://developer.fingerspot.io/api/get_attlog';
 
-// 2. Prepare Data
+// 2. Prepare Request Data
 $data = [
-    'trans_id'   => '1',                // Unique ID for this request
+    'trans_id'   => (string)time(),     // Unique ID for this request
     'cloud_id'   => $cloudId,           // Device Cloud ID
     'start_date' => date('Y-m-d'),      // Start date (YYYY-MM-DD)
     'end_date'   => date('Y-m-d')       // End date (YYYY-MM-DD)
@@ -24,7 +28,8 @@ $data = [
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -49,7 +54,8 @@ if (curl_errno($ch)) {
     $result = json_decode($response, true);
 
     echo "--- Get Attendance Logs Sample ---\n";
-    echo "Requesting logs for Cloud ID: $cloudId\n";
+    echo "Endpoint: $apiUrl\n";
+    echo "Device ID: $cloudId\n";
     echo "Date Range: " . $data['start_date'] . " to " . $data['end_date'] . "\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
@@ -57,7 +63,10 @@ if (curl_errno($ch)) {
         echo "Logs retrieved successfully:\n";
         if (isset($result['data']) && !empty($result['data'])) {
             foreach ($result['data'] as $log) {
-                echo "- PIN: " . $log['pin'] . " | Time: " . $log['scan'] . " | Status: " . $log['status_scan'] . "\n";
+                echo "- PIN: " . str_pad($log['pin'], 5) . " | ";
+                echo "Time: " . $log['scan'] . " | ";
+                echo "Verify: " . $log['verify'] . " | ";
+                echo "Status: " . $log['status_scan'] . "\n";
             }
         } else {
             echo "No logs found for the selected period.\n";
@@ -79,10 +88,10 @@ Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
 
 {
-    "trans_id": "1",
+    "trans_id": "1705824000",
     "cloud_id": "FTV123456",
-    "start_date": "2024-01-01",
-    "end_date": "2024-01-07"
+    "start_date": "2024-01-21",
+    "end_date": "2024-01-21"
 }
 
 Example Response (Success):
@@ -92,13 +101,13 @@ Example Response (Success):
     "data": [
         {
             "pin": "1",
-            "scan": "2024-01-01 08:00:15",
+            "scan": "2024-01-21 08:00:15",
             "verify": "1",
             "status_scan": "0"
         },
         {
-            "pin": "1",
-            "scan": "2024-01-01 17:05:30",
+            "pin": "12",
+            "scan": "2024-01-21 17:05:30",
             "verify": "1",
             "status_scan": "1"
         }
