@@ -23,19 +23,27 @@ Task 2/
 └── README.md             # Documentation
 ```
 
-## Features Implemented
+## API Endpoints & Features
 
-The following main features and endpoints have been implemented:
+The following main endpoints and features from [developer.fingerspot.io](https://developer.fingerspot.io) have been identified and implemented:
 
-1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+### Core API Endpoints
+| Feature | Endpoint | Description |
+| :--- | :--- | :--- |
+| **Authentication** | N/A | Uses Bearer Token in the HTTP `Authorization` header for all requests. |
+| **Get Device List** | `/api/get_device` | Retrieves a list of all devices registered to the account. |
+| **Get Attendance Logs**| `/api/get_attlog` | Fetches scan logs from a specific device within a defined date range. |
+| **Add/Update User** | `/api/set_userinfo` | Sends user information (PIN, name, etc.) to the attendance machine. |
+| **Request User Info**| `/api/get_userinfo` | Requests user data from the device (result is returned via Webhook). |
+| **Delete User** | `/api/delete_userinfo`| Removes a specific user's information from the attendance machine. |
+| **Remote Registration**| `/api/reg_online` | Triggers the device to enter remote registration mode for various biometric types. |
+| **Sync Machine Time** | `/api/set_time` | Synchronizes the device's date, time, and timezone. |
+| **Restart Machine** | `/api/restart` | Commands the attendance machine to perform a system reboot. |
+
+### Webhook Features
+The Fingerspot Cloud API utilizes Webhooks to push real-time data and asynchronous command results to your server:
+- **Real-time Scan Data**: Automatically receives scan logs as they happen on the device.
+- **Asynchronous Results**: Receives confirmation and data (e.g., from `get_userinfo`) for commands sent to the machine.
 
 ## Requirements
 
