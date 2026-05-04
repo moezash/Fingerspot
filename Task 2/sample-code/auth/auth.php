@@ -5,6 +5,10 @@
  * This sample demonstrates how to set up the authentication headers
  * required for every request to the Fingerspot API.
  *
+ * Requirements:
+ * - Pure PHP with cURL extension
+ * - API Token from developer.fingerspot.io
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -14,9 +18,11 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 
 // 2. Prepare Headers
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
+// Content-Type and Accept should be set to application/json
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
@@ -28,13 +34,24 @@ function testAuthentication($url, $headers) {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+
+    // For local testing environments with SSL issues, you might need:
+    // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    // However, it's recommended to keep it enabled in production.
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+    if (curl_errno($ch)) {
+        $error_msg = curl_error($ch);
+    }
+
     curl_close($ch);
+
+    if (isset($error_msg)) {
+        return ['error' => $error_msg];
+    }
 
     return [
         'code' => $httpCode,
@@ -52,11 +69,12 @@ foreach ($headers as $header) {
 echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
 
 /*
-Example Request Headers:
-GET /api/get_device HTTP/1.1
+Example Request:
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 Example Response (if token is invalid):
 {
