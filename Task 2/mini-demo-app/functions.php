@@ -12,6 +12,11 @@ require_once 'config.php';
  * @return array The decoded JSON response
  */
 function fingerspot_request($endpoint, $data = []) {
+    // Return mock data if in DEMO_MODE
+    if (DEMO_MODE) {
+        return get_mock_response($endpoint, $data);
+    }
+
     $url = API_URL . '/' . $endpoint;
 
     // Ensure trans_id is present
@@ -21,7 +26,8 @@ function fingerspot_request($endpoint, $data = []) {
 
     $headers = [
         'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     $ch = curl_init($url);
@@ -95,5 +101,41 @@ function sync_time($cloud_id) {
     return fingerspot_request('set_time', [
         'cloud_id' => $cloud_id
     ]);
+}
+
+/**
+ * Generate mock data for demonstration purposes
+ */
+function get_mock_response($endpoint, $data) {
+    switch ($endpoint) {
+        case 'get_device':
+            return [
+                'status' => true,
+                'message' => 'Success (Demo Mode)',
+                'data' => [
+                    ['cloud_id' => 'DEMO-123', 'name' => 'Main Office Device', 'status' => 'Online'],
+                    ['cloud_id' => 'DEMO-456', 'name' => 'Warehouse Device', 'status' => 'Offline']
+                ]
+            ];
+        case 'get_attlog':
+            return [
+                'status' => true,
+                'message' => 'Success (Demo Mode)',
+                'data' => [
+                    ['pin' => '101', 'scan' => date('Y-m-d 08:00:15'), 'verify' => '1', 'status_scan' => '0'],
+                    ['pin' => '102', 'scan' => date('Y-m-d 08:05:44'), 'verify' => '1', 'status_scan' => '0'],
+                    ['pin' => '101', 'scan' => date('Y-m-d 17:02:10'), 'verify' => '1', 'status_scan' => '1']
+                ]
+            ];
+        case 'set_userinfo':
+        case 'delete_userinfo':
+        case 'set_time':
+            return [
+                'status' => true,
+                'message' => 'Success (Demo Mode: Command simulated)'
+            ];
+        default:
+            return ['status' => false, 'message' => 'Unknown endpoint'];
+    }
 }
 ?>

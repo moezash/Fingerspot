@@ -1,115 +1,93 @@
 <?php
 /**
- * Sample code for Webhook Receiver
+ * Sample code for Webhook Receiver (Fingerspot API)
  *
  * This script demonstrates how to receive and process real-time data
- * sent by Fingerspot (e.g., attendance logs or command responses).
+ * sent from the Fingerspot Cloud API to your server.
  *
- * Note: Your server must be publicly accessible and the URL
- * configured in the Fingerspot Developer Dashboard.
+ * To use this:
+ * 1. Host this file on a public-facing web server.
+ * 2. Configure the URL of this file in your Fingerspot Developer Dashboard.
  *
  * Documentation: https://developer.fingerspot.io
  */
 
-// 1. Get the raw POST data from the request body
-$json = file_get_contents('php://input');
+// 1. Log file for debugging
+$logFile = 'webhook_log.txt';
 
-// 2. Decode the JSON data
-$data = json_decode($json, true);
+// 2. Read the raw POST data
+$rawData = file_get_contents('php://input');
 
-// 3. Check if data was received
+// 3. Log the raw request for debugging
+file_put_contents($logFile, "[" . date('Y-m-d H:i:s') . "] Raw Data: " . $rawData . PHP_EOL, FILE_APPEND);
+
+// 4. Decode the JSON data
+$data = json_decode($rawData, true);
+
 if ($data) {
-    // Log the data for debugging (optional)
-    file_put_contents('webhook_log.txt', date('Y-m-d H:i:s') . " - " . $json . PHP_EOL, FILE_APPEND);
+    // 5. Process based on data type
+    // Fingerspot sends different types of data: 'attlog', 'get_userinfo', 'reg_online', etc.
+    $type = $data['type'] ?? 'unknown';
 
-    // 4. Process based on the type of data
-    // Fingerspot often includes a "type" or checks for specific fields
+    switch ($type) {
+        case 'attlog':
+            // Real-time scan log
+            $pin = $data['pin'] ?? 'N/A';
+            $scanTime = $data['scan'] ?? 'N/A';
+            file_put_contents($logFile, "Processed Scan: PIN $pin at $scanTime" . PHP_EOL, FILE_APPEND);
+            break;
 
-    if (isset($data['type'])) {
-        switch ($data['type']) {
-            case 'attlog':
-                // Realtime attendance scan
-                processAttendance($data);
-                break;
+        case 'get_userinfo':
+            // Response from get_userinfo command
+            $pin = $data['pin'] ?? 'N/A';
+            $name = $data['name'] ?? 'N/A';
+            file_put_contents($logFile, "Processed User Info: $name (PIN: $pin)" . PHP_EOL, FILE_APPEND);
+            break;
 
-            case 'get_userinfo':
-                // Response from a Get Userinfo request
-                processUserInfo($data);
-                break;
+        case 'reg_online':
+            // Response from reg_online command
+            $status = $data['status'] ?? 'unknown';
+            file_put_contents($logFile, "Registration Result: $status" . PHP_EOL, FILE_APPEND);
+            break;
 
-            case 'reg_online':
-                // Result of a registration process
-                processRegistration($data);
-                break;
-
-            case 'delete_userinfo':
-                // Result of a delete process
-                processDeleteStatus($data);
-                break;
-        }
+        default:
+            file_put_contents($logFile, "Received unknown webhook type: $type" . PHP_EOL, FILE_APPEND);
+            break;
     }
 
-    // 5. Always respond with a 200 OK to acknowledge receipt
+    // 6. Respond to Fingerspot API
+    // It's good practice to respond with a 200 OK
     http_response_code(200);
-    echo json_encode(["status" => true, "message" => "Data received"]);
+    echo json_encode(['status' => true, 'message' => 'Data received']);
 } else {
-    // No data received
+    // Invalid data
     http_response_code(400);
-    echo json_encode(["status" => false, "message" => "No data received"]);
-}
-
-/**
- * Example function to process attendance logs
- */
-function processAttendance($data) {
-    $pin = $data['data']['pin'] ?? 'Unknown';
-    $time = $data['data']['scan'] ?? 'Unknown';
-    $cloudId = $data['cloud_id'] ?? 'Unknown';
-
-    // Log to a file or database
-    // error_log("Attendance: User $pin scanned at $time on device $cloudId");
-}
-
-function processUserInfo($data) {
-    // Handle user data received from machine
-}
-
-function processRegistration($data) {
-    // Handle registration result
-}
-
-function processDeleteStatus($data) {
-    // Handle delete result
+    echo json_encode(['status' => false, 'message' => 'Invalid JSON']);
 }
 
 /*
-Example Incoming Realtime Attlog:
+Example Incoming Webhook (attlog):
 {
     "type": "attlog",
-    "cloud_id": "FTVXXXXXX",
-    "data": {
-        "pin": "1",
-        "scan": "2024-01-21 10:11:00",
-        "verify": "1",
-        "status_scan": "0"
-    }
+    "cloud_id": "FTV12345678",
+    "pin": "101",
+    "scan": "2024-05-14 10:30:45",
+    "verify": "1",
+    "status_scan": "0"
 }
 
-Example Incoming Userinfo Response:
+Example Incoming Webhook (get_userinfo):
 {
     "type": "get_userinfo",
-    "cloud_id": "FTVXXXXXX",
-    "trans_id": "1",
-    "data": {
-        "pin": "1",
-        "name": "Budi",
-        "privilege": "0",
-        "finger": "1",
-        "face": "0",
-        "password": "111",
-        "rfid": "",
-        "template": "..."
-    }
+    "cloud_id": "FTV12345678",
+    "trans_id": "1715679300",
+    "pin": "101",
+    "name": "John Doe",
+    "privilege": "0",
+    "password": "",
+    "rfid": "",
+    "finger_data": "...",
+    "face_data": "..."
 }
 */
 ?>

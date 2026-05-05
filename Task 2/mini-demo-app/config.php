@@ -11,7 +11,10 @@ define('API_TOKEN', 'YOUR_API_TOKEN_HERE');
 define('API_URL', 'https://developer.fingerspot.io/api');
 
 // App Settings
-define('APP_NAME', 'Attendance Monitor');
+define('APP_NAME', 'Fingerspot Attendance Dashboard');
+
+// Demo Mode: If API_TOKEN is the default placeholder, show mock data
+define('DEMO_MODE', (API_TOKEN === 'YOUR_API_TOKEN_HERE'));
 
 // Error reporting
 error_reporting(E_ALL);
