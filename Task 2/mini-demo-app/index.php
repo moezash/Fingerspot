@@ -148,12 +148,12 @@ if ($selected_device) {
                                             </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">PIN</label>
-                                            <input type="text" name="pin" class="form-control" required>
+                                            <label for="pin" class="form-label">PIN</label>
+                                            <input type="text" id="pin" name="pin" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" name="name" class="form-control" required>
+                                            <label for="name" class="form-label">Full Name</label>
+                                            <input type="text" id="name" name="name" class="form-control" required>
                                         </div>
                                         <button type="submit" class="btn btn-success w-100">Send to Machine</button>
                                     </form>

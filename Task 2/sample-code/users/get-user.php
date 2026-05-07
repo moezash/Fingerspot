@@ -63,5 +63,18 @@ curl_close($ch);
 Note: Fingerspot API often works asynchronously for "Get Userinfo".
 The API call initiates the request, and the machine pushes the actual
 user data back to your server via the configured Webhook.
+
+Example Request Body:
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success):
+{
+    "status": true,
+    "message": "Success"
+}
 */
 ?>

@@ -15,7 +15,7 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_attlog';
 
 // 2. Prepare Data
 $data = [
-    'trans_id'   => '1',                // Unique ID for this request
+    'trans_id'   => (string)time(),     // Unique ID for this request
     'cloud_id'   => $cloudId,           // Device Cloud ID
     'start_date' => date('Y-m-d'),      // Start date (YYYY-MM-DD)
     'end_date'   => date('Y-m-d')       // End date (YYYY-MM-DD)
@@ -79,10 +79,10 @@ Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
 
 {
-    "trans_id": "1",
+    "trans_id": "1715070000",
     "cloud_id": "FTV123456",
-    "start_date": "2024-01-01",
-    "end_date": "2024-01-07"
+    "start_date": "2024-05-07",
+    "end_date": "2024-05-07"
 }
 
 Example Response (Success):
@@ -91,14 +91,14 @@ Example Response (Success):
     "message": "Success",
     "data": [
         {
-            "pin": "1",
-            "scan": "2024-01-01 08:00:15",
+            "pin": "101",
+            "scan": "2024-05-07 08:00:15",
             "verify": "1",
             "status_scan": "0"
         },
         {
-            "pin": "1",
-            "scan": "2024-01-01 17:05:30",
+            "pin": "101",
+            "scan": "2024-05-07 17:05:30",
             "verify": "1",
             "status_scan": "1"
         }

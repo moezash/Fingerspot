@@ -25,12 +25,15 @@ $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-// Using POST as per Fingerspot API convention for most endpoints
+
+// Using POST as per Fingerspot API convention
 curl_setopt($ch, CURLOPT_POST, true);
-// Even for listing, a trans_id is often recommended
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+
+// A trans_id is often recommended for tracking requests
+$data = [
     'trans_id' => '1'
-]));
+];
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
 // 5. Execute Request
 $response = curl_exec($ch);
@@ -49,10 +52,11 @@ if (curl_errno($ch)) {
     if ($result && isset($result['status']) && $result['status']) {
         echo "Devices found:\n";
         foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . " | Status: " . ($device['status'] ?? 'N/A') . "\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
+        echo "Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -88,7 +92,7 @@ Example Response (Success):
     ]
 }
 
-Example Response (Unauthorized):
+Example Response (Error):
 {
     "status": false,
     "message": "Unauthorized"
