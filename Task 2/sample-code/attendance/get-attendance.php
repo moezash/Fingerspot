@@ -48,6 +48,10 @@ if (curl_errno($ch)) {
     // 8. Process Response
     $result = json_decode($response, true);
 
+    if ($result === null) {
+        die("Error: Failed to decode JSON response. Raw response: " . $response);
+    }
+
     echo "--- Get Attendance Logs Sample ---\n";
     echo "Requesting logs for Cloud ID: $cloudId\n";
     echo "Date Range: " . $data['start_date'] . " to " . $data['end_date'] . "\n";

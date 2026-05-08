@@ -43,6 +43,10 @@ if (curl_errno($ch)) {
     // 7. Process Response
     $result = json_decode($response, true);
 
+    if ($result === null) {
+        die("Error: Failed to decode JSON response. Raw response: " . $response);
+    }
+
     echo "--- Get Device List Sample ---\n";
     echo "HTTP Status Code: $httpCode\n\n";
 

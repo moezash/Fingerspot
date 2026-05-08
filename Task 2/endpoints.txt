@@ -1,0 +1,44 @@
+Fingerspot Cloud API - Main Endpoints List
+
+1. Get Device List
+   Endpoint: https://developer.fingerspot.io/api/get_device
+   Method: POST
+   Description: Retrieve all registered attendance machines under your account.
+
+2. Get Attendance Logs
+   Endpoint: https://developer.fingerspot.io/api/get_attlog
+   Method: POST
+   Description: Fetch scan data from a specific device within a date range.
+
+3. Get User Information
+   Endpoint: https://developer.fingerspot.io/api/get_userinfo
+   Method: POST
+   Description: Request employee data (PIN, name, templates) from a specific device. Result is usually sent via Webhook.
+
+4. Set User Information (Add/Update Employee)
+   Endpoint: https://developer.fingerspot.io/api/set_userinfo
+   Method: POST
+   Description: Upload or update employee information (PIN, name, privilege) to the machine.
+
+5. Delete User Information
+   Endpoint: https://developer.fingerspot.io/api/delete_userinfo
+   Method: POST
+   Description: Remote command to delete an employee from a specific device.
+
+6. Register Online
+   Endpoint: https://developer.fingerspot.io/api/reg_online
+   Method: POST
+   Description: Trigger remote registration mode on the device for templates (fingerprint, face, etc.).
+
+7. Set Machine Time (Sync Time)
+   Endpoint: https://developer.fingerspot.io/api/set_time
+   Method: POST
+   Description: Synchronize the machine's time with the server or a specific timezone.
+
+8. Restart Machine
+   Endpoint: https://developer.fingerspot.io/api/restart
+   Method: POST
+   Description: Remotely reboot the attendance machine.
+
+9. Webhook (Real-time Push)
+   Description: Not an endpoint you call, but a URL you provide to receive real-time data push (scan logs, command responses).

@@ -55,4 +55,24 @@ if (curl_errno($ch)) {
 }
 
 curl_close($ch);
+
+/*
+Example Request:
+POST /api/delete_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+
+{
+    "trans_id": "1",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success):
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>
