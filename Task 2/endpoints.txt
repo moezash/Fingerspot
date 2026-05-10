@@ -1,0 +1,49 @@
+Main Fingerspot Cloud API Endpoints:
+
+1. Authentication
+   - Base URL: https://developer.fingerspot.io/api
+   - Auth Method: Bearer Token in Authorization Header
+
+2. Devices
+   - Get Device List
+     - Endpoint: /api/get_device
+     - Method: POST
+     - Description: Retrieve a list of all registered attendance machines.
+
+3. Attendance
+   - Get Attendance Logs
+     - Endpoint: /api/get_attlog
+     - Method: POST
+     - Description: Retrieve scan data logs from a specific device within a date range.
+
+4. User Management
+   - Get User Information
+     - Endpoint: /api/get_userinfo
+     - Method: POST
+     - Description: Request user data (PIN, name, templates) from the machine (asynchronous via Webhook).
+   - Set User Information (Add/Update)
+     - Endpoint: /api/set_userinfo
+     - Method: POST
+     - Description: Upload or update user data on the attendance machine.
+   - Delete User Information
+     - Endpoint: /api/delete_userinfo
+     - Method: POST
+     - Description: Remove user data from the attendance machine.
+   - Remote Registration
+     - Endpoint: /api/reg_online
+     - Method: POST
+     - Description: Trigger remote registration mode on the machine for biometric enrollment.
+
+5. Device Synchronization/Maintenance
+   - Set Time
+     - Endpoint: /api/set_time
+     - Method: POST
+     - Description: Synchronize the machine's time and timezone.
+   - Restart Machine
+     - Endpoint: /api/restart
+     - Method: POST
+     - Description: Remote reboot of the attendance machine.
+
+6. Webhook
+   - Webhook Receiver
+     - Description: A developer-defined endpoint to receive real-time push data (logs and command responses) from Fingerspot Cloud.
