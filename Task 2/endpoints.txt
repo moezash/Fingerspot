@@ -1,0 +1,28 @@
+Main Fingerspot Cloud API Endpoints:
+
+1. POST /api/get_device
+   Description: Retrieve the list of devices registered in the account.
+
+2. POST /api/get_attlog
+   Description: Retrieve attendance logs (scan data) from a specific device.
+
+3. POST /api/set_userinfo
+   Description: Add or update user information (PIN, Name, Templates) on a device.
+
+4. POST /api/get_userinfo
+   Description: Request user information from a device. The result is typically sent via Webhook.
+
+5. POST /api/delete_userinfo
+   Description: Delete user information from a device.
+
+6. POST /api/reg_online
+   Description: Trigger remote registration mode on a device for various biometric types.
+
+7. POST /api/set_time
+   Description: Synchronize the device's date, time, and timezone.
+
+8. POST /api/restart
+   Description: Remotely restart the attendance machine.
+
+Note: All requests require 'Authorization: Bearer <token>' header and 'Content-Type: application/json'.
+Most requests require 'trans_id' and 'cloud_id' in the JSON body.

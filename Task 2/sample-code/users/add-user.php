@@ -5,6 +5,11 @@
  * This sample demonstrates how to send employee data to the
  * attendance machine.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid Fingerspot API Token
+ * - Device Cloud ID
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -15,55 +20,54 @@ $apiUrl   = 'https://developer.fingerspot.io/api/set_userinfo';
 
 // 2. Prepare User Data
 $data = [
-    'trans_id'  => '1',            // Unique ID for this request
+    'trans_id'  => (string)time(), // Unique identifier for this request
     'cloud_id'  => $cloudId,       // Device Cloud ID
     'pin'       => '101',          // Employee PIN / ID
     'name'      => 'John Doe',     // Employee Name
     'privilege' => '0',            // 0: User, 1: Admin
     'password'  => '',             // Device password (optional)
     'rfid'      => '',             // RFID Card ID (optional)
-    // Templates can be sent here as well if you have the hex/base64 data
-    // 'finger_data' => '...',
-    // 'face_data'   => '...'
+    // Biometric templates can also be included if available (finger_data, face_data, etc.)
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
-// 4. Initialize cURL
+// 4. Initialize and Configure cURL
 $ch = curl_init($apiUrl);
-
-// 5. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+// SSL Verification: Disable for local testing if needed, enable for production
 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-// 6. Execute Request
+// 5. Execute Request
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-// 7. Check for errors
+// 6. Error Handling and Response Processing
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
-    // 8. Process Response
     $result = json_decode($response, true);
 
-    echo "--- Add/Set User Information Sample ---\n";
+    echo "--- Fingerspot API: Add/Set User Information ---\n";
     echo "Sending data for PIN: " . $data['pin'] . " (" . $data['name'] . ")\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
+    if ($result && isset($result['success']) && $result['success']) {
         echo "Command sent successfully to the machine.\n";
-        echo "Note: The machine will process this command and report the result via Webhook.\n";
+        echo "Note: This is an asynchronous command. The machine will process it and report the result via your Webhook.\n";
     } else {
         echo "Failed to send command.\n";
-        echo "Response: " . $response . "\n";
+        echo "Message: " . ($result['message'] ?? 'Unknown error occurred') . "\n";
+        echo "Raw Response: " . $response . "\n";
     }
 }
 
@@ -72,8 +76,8 @@ curl_close($ch);
 /*
 Example Request Body:
 {
-    "trans_id": "1",
-    "cloud_id": "FTV123456",
+    "trans_id": "1700000000",
+    "cloud_id": "FTV123456789",
     "pin": "101",
     "name": "John Doe",
     "privilege": "0",
@@ -83,8 +87,14 @@ Example Request Body:
 
 Example Response (Success):
 {
-    "status": true,
+    "success": true,
     "message": "Success"
+}
+
+Example Response (Error):
+{
+    "success": false,
+    "message": "Invalid Cloud ID"
 }
 */
 ?>

@@ -6,6 +6,7 @@ This folder contains the results of the Task 2 internship project, focused on in
 
 ```text
 Task 2/
+├── endpoints.txt         # List of all main API endpoints
 ├── sample-code/          # Independent runnable sample codes
 │   ├── auth/             # Authentication & Header setup
 │   ├── devices/          # Device listing & status
