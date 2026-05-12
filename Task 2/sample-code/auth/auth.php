@@ -1,73 +1,105 @@
 <?php
 /**
- * Sample code for Authentication with Fingerspot API
+ * Sample code for Authentication with Fingerspot Cloud API
  *
- * This sample demonstrates how to set up the authentication headers
- * required for every request to the Fingerspot API.
+ * This sample demonstrates how to set up the Authorization header
+ * using a Bearer Token, which is required for all API calls.
+ *
+ * Requirements:
+ * - PHP cURL extension
+ * - API Token from developer.fingerspot.io
  *
  * Documentation: https://developer.fingerspot.io
  */
 
 // 1. Configuration
-// Get your API Token from the Fingerspot Developer Dashboard
+// Replace with your actual API Token from Fingerspot Developer Dashboard
 $apiToken = 'YOUR_API_TOKEN_HERE';
 
 // 2. Prepare Headers
-// Every request to Fingerspot API must include the Bearer Token in the Authorization header
+// Fingerspot API requires Bearer Token authentication and JSON content type
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
- * Helper function to demonstrate how headers are used in a cURL request
+ * Helper function to demonstrate a simple authenticated request
  */
-function testAuthentication($url, $headers) {
-    $ch = curl_init($url);
+function checkConnection($headers) {
+    // We use /api/get_device as a simple way to test if our token is valid
+    $apiUrl = 'https://developer.fingerspot.io/api/get_device';
+
+    $ch = curl_init($apiUrl);
+
+    // Request data
+    $postData = json_encode([
+        'trans_id' => (string)time()
+    ]);
 
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Recommended for local dev only
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+    if (curl_errno($ch)) {
+        return 'cURL Error: ' . curl_error($ch);
+    }
+
     curl_close($ch);
 
     return [
         'code' => $httpCode,
-        'response' => $response
+        'body' => json_decode($response, true)
     ];
 }
 
-// Displaying how headers should look
-echo "--- Fingerspot API Authentication Sample ---\n";
-echo "Headers to be used in cURL:\n";
+// --- Displaying Sample Output ---
+echo "=== Fingerspot API Authentication Setup ===\n";
+echo "Headers prepared:\n";
 foreach ($headers as $header) {
-    echo "- $header\n";
+    echo "  [OK] $header\n";
 }
 
-echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
+echo "\nTo use these headers in your projects, simply pass the \$headers array \nto your curl_setopt(\$ch, CURLOPT_HTTPHEADER, \$headers) function.\n";
 
 /*
-Example Request Headers:
-GET /api/get_device HTTP/1.1
+---------------------------------------------------------------------------
+Example Request:
+---------------------------------------------------------------------------
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
-Example Response (if token is invalid):
 {
-    "status": false,
+    "trans_id": "1705824000"
+}
+
+---------------------------------------------------------------------------
+Example Response (Success - 200 OK):
+---------------------------------------------------------------------------
+{
+    "success": true,
+    "message": "Success",
+    "data": []
+}
+
+---------------------------------------------------------------------------
+Example Response (Error - 401 Unauthorized):
+---------------------------------------------------------------------------
+{
+    "success": false,
     "message": "Unauthorized"
 }
-
-Example Response (if token is valid):
-{
-    "status": true,
-    "data": [...]
-}
+---------------------------------------------------------------------------
 */
 ?>
