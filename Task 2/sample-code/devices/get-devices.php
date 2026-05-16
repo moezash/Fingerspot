@@ -5,6 +5,10 @@
  * This sample demonstrates how to retrieve the list of devices
  * registered in your Fingerspot account.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid Fingerspot API Token
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -15,30 +19,36 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_device'; // Endpoint to get
 // 2. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
-// 3. Initialize cURL
+// 3. Prepare Payload
+// trans_id is a unique transaction identifier, here we use current timestamp
+$payload = [
+    'trans_id' => (string)time()
+];
+
+// 4. Initialize and Configure cURL
 $ch = curl_init($apiUrl);
 
-// 4. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-// Using POST as per Fingerspot API convention for most endpoints
 curl_setopt($ch, CURLOPT_POST, true);
-// Even for listing, a trans_id is often recommended
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'trans_id' => '1'
-]));
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+// For local testing where SSL certificates might not be set up
+// Set to true in production for security!
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 // 5. Execute Request
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-// 6. Check for errors
+// 6. Check for cURL errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo "--- Get Device List Sample ---\n";
+    echo 'cURL Error: ' . curl_error($ch) . "\n";
 } else {
     // 7. Process Response
     $result = json_decode($response, true);
@@ -46,14 +56,20 @@ if (curl_errno($ch)) {
     echo "--- Get Device List Sample ---\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
+    // Fingerspot API usually returns a JSON with a 'success' or 'status' boolean
+    if ($result && isset($result['success']) && $result['success']) {
         echo "Devices found:\n";
-        foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+        if (isset($result['data']) && is_array($result['data'])) {
+            foreach ($result['data'] as $device) {
+                echo "- SN: " . ($device['cloud_id'] ?? 'N/A') . " | Name: " . ($device['name'] ?? 'N/A') . " | Status: " . ($device['status'] ?? 'Unknown') . "\n";
+            }
+        } else {
+            echo "No device data in response.\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Raw Response: " . $response . "\n";
     }
 }
 
@@ -65,14 +81,15 @@ POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1"
+    "trans_id": "1714567890"
 }
 
 Example Response (Success):
 {
-    "status": true,
+    "success": true,
     "message": "Success",
     "data": [
         {
@@ -88,10 +105,10 @@ Example Response (Success):
     ]
 }
 
-Example Response (Unauthorized):
+Example Response (Failure):
 {
-    "status": false,
-    "message": "Unauthorized"
+    "success": false,
+    "message": "Invalid API Token"
 }
 */
 ?>
