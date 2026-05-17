@@ -21,7 +21,8 @@ function fingerspot_request($endpoint, $data = []) {
 
     $headers = [
         'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     $ch = curl_init($url);
@@ -37,14 +38,15 @@ function fingerspot_request($endpoint, $data = []) {
     curl_close($ch);
 
     if ($error) {
-        return ['status' => false, 'message' => "cURL Error: $error"];
+        return ['success' => false, 'message' => "cURL Error: $error"];
     }
 
     $decoded = json_decode($response, true);
     if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+        return ['success' => false, 'message' => "Invalid JSON response: $response"];
     }
 
+    // Fingerspot API returns 'success' as a boolean
     return $decoded;
 }
 

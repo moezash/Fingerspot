@@ -11,18 +11,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         switch ($_POST['action']) {
             case 'add_employee':
                 $res = add_employee($_POST['cloud_id'], $_POST['pin'], $_POST['name']);
-                $message = $res['message'] ?? ($res['status'] ? 'Employee added successfully' : 'Failed to add employee');
-                $message_type = $res['status'] ? 'success' : 'danger';
+                $message = $res['message'] ?? ($res['success'] ? 'Employee added successfully' : 'Failed to add employee');
+                $message_type = $res['success'] ? 'success' : 'danger';
                 break;
             case 'delete_employee':
                 $res = delete_employee($_POST['cloud_id'], $_POST['pin']);
-                $message = $res['message'] ?? ($res['status'] ? 'Employee delete command sent' : 'Failed to delete employee');
-                $message_type = $res['status'] ? 'success' : 'danger';
+                $message = $res['message'] ?? ($res['success'] ? 'Employee delete command sent' : 'Failed to delete employee');
+                $message_type = $res['success'] ? 'success' : 'danger';
                 break;
             case 'sync_time':
                 $res = sync_time($_POST['cloud_id']);
-                $message = $res['message'] ?? ($res['status'] ? 'Time sync command sent' : 'Failed to sync time');
-                $message_type = $res['status'] ? 'success' : 'danger';
+                $message = $res['message'] ?? ($res['success'] ? 'Time sync command sent' : 'Failed to sync time');
+                $message_type = $res['success'] ? 'success' : 'danger';
                 break;
         }
     }
@@ -36,7 +36,7 @@ $selected_device = $_GET['device'] ?? '';
 if ($selected_device) {
     $today = date('Y-m-d');
     $att_res = get_attendance($selected_device, $today, $today);
-    if (isset($att_res['status']) && $att_res['status'] && isset($att_res['data'])) {
+    if (isset($att_res['success']) && $att_res['success'] && isset($att_res['data'])) {
         $attendance = $att_res['data'];
     }
 }
@@ -86,7 +86,7 @@ if ($selected_device) {
                                 <input type="hidden" name="page" value="dashboard">
                                 <select name="device" class="form-select me-2">
                                     <option value="">Select Device</option>
-                                    <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
+                                    <?php if (isset($devices['success']) && $devices['success'] && isset($devices['data'])): ?>
                                         <?php foreach ($devices['data'] as $dev): ?>
                                             <option value="<?php echo $dev['cloud_id']; ?>" <?php echo $selected_device == $dev['cloud_id'] ? 'selected' : ''; ?>>
                                                 <?php echo htmlspecialchars($dev['name']); ?> (<?php echo $dev['cloud_id']; ?>)
@@ -140,7 +140,7 @@ if ($selected_device) {
                                         <div class="mb-3">
                                             <label class="form-label">Device</label>
                                             <select name="cloud_id" class="form-select" required>
-                                                <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
+                                                <?php if (isset($devices['success']) && $devices['success'] && isset($devices['data'])): ?>
                                                     <?php foreach ($devices['data'] as $dev): ?>
                                                         <option value="<?php echo $dev['cloud_id']; ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
                                                     <?php endforeach; ?>
@@ -172,7 +172,7 @@ if ($selected_device) {
                                         <div class="col-md-5">
                                             <select name="cloud_id" class="form-select" required>
                                                 <option value="">Select Device</option>
-                                                <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
+                                                <?php if (isset($devices['success']) && $devices['success'] && isset($devices['data'])): ?>
                                                     <?php foreach ($devices['data'] as $dev): ?>
                                                         <option value="<?php echo $dev['cloud_id']; ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
                                                     <?php endforeach; ?>
@@ -205,7 +205,7 @@ if ($selected_device) {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
+                                    <?php if (isset($devices['success']) && $devices['success'] && isset($devices['data'])): ?>
                                         <?php foreach ($devices['data'] as $dev): ?>
                                             <tr>
                                                 <td><?php echo htmlspecialchars($dev['cloud_id']); ?></td>

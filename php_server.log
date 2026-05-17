@@ -1,0 +1,10 @@
+[Sun May 17 15:23:31 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Sun May 17 15:24:08 2026] [::1]:33398 Accepted
+[Sun May 17 15:24:09 2026] [::1]:33398 [200]: GET /index.php
+[Sun May 17 15:24:09 2026] [::1]:33398 Closing
+[Sun May 17 15:24:10 2026] [::1]:33414 Accepted
+[Sun May 17 15:24:11 2026] [::1]:33414 [200]: GET /index.php?page=employees
+[Sun May 17 15:24:11 2026] [::1]:33414 Closing
+[Sun May 17 15:24:11 2026] [::1]:33428 Accepted
+[Sun May 17 15:24:12 2026] [::1]:33428 [200]: GET /index.php?page=devices
+[Sun May 17 15:24:12 2026] [::1]:33428 Closing
