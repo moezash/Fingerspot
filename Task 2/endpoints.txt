@@ -1,0 +1,44 @@
+Fingerspot Cloud API Main Endpoints
+----------------------------------
+
+1. /api/get_device
+   Method: POST
+   Description: Retrieve a list of all attendance devices registered to the account.
+   Parameters: trans_id (optional)
+
+2. /api/get_attlog
+   Method: POST
+   Description: Retrieve attendance logs (scan data) from a specific device.
+   Parameters: trans_id, cloud_id, start_date (YYYY-MM-DD), end_date (YYYY-MM-DD)
+
+3. /api/set_userinfo
+   Method: POST
+   Description: Add or update user information (PIN, Name, Privilege) on a specific device.
+   Parameters: trans_id, cloud_id, pin, name, privilege
+
+4. /api/get_userinfo
+   Method: POST
+   Description: Request user information from a device. This is an asynchronous command; the result is sent via Webhook.
+   Parameters: trans_id, cloud_id, pin
+
+5. /api/delete_userinfo
+   Method: POST
+   Description: Remove a user's information from a specific device.
+   Parameters: trans_id, cloud_id, pin
+
+6. /api/reg_online
+   Method: POST
+   Description: Trigger remote registration mode on a device for various templates (fingerprint, face, etc.).
+   Parameters: trans_id, cloud_id, pin, type (e.g., 'fingerprint', 'face')
+
+7. /api/set_time
+   Method: POST
+   Description: Synchronize the device's date, time, and timezone.
+   Parameters: trans_id, cloud_id
+
+8. /api/restart
+   Method: POST
+   Description: Remotely reboot the attendance device.
+   Parameters: trans_id, cloud_id
+
+Note: All requests require an 'Authorization: Bearer <API_TOKEN>' header and 'Content-Type: application/json'.
