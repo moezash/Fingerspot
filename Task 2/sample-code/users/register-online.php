@@ -5,6 +5,10 @@
  * This sample demonstrates how to trigger the machine to start
  * a registration process for a specific user.
  *
+ * Requirements:
+ * - Pure PHP (no frameworks)
+ * - PHP cURL extension
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -15,7 +19,7 @@ $apiUrl   = 'https://developer.fingerspot.io/api/reg_online';
 
 // 2. Prepare Data
 $data = [
-    'trans_id'     => '1',
+    'trans_id'     => (string)time(),
     'cloud_id'     => $cloudId,
     'pin'          => '101',
     'verification' => '0' // 0-10: Finger, 12: Face, 13: Vein
@@ -24,7 +28,8 @@ $data = [
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -39,22 +44,43 @@ curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 // 6. Execute Request
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
     $result = json_decode($response, true);
 
     echo "--- Register Online Sample ---\n";
     echo "Triggering registration for PIN " . $data['pin'] . " (Mode: " . $data['verification'] . ")\n";
+    echo "HTTP Status Code: $httpCode\n\n";
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Command successful. Machine is now in registration mode.\n";
     } else {
         echo "Failed to trigger registration.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Raw Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
+
+/*
+Example Request Body:
+------------------------------------------------------------
+{
+    "trans_id": "1710000000",
+    "cloud_id": "FTV123456",
+    "pin": "101",
+    "verification": "0"
+}
+
+Example Response (Success):
+------------------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>

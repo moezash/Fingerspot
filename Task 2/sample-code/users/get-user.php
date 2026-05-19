@@ -5,6 +5,10 @@
  * This sample demonstrates how to request user data (names, templates, etc.)
  * from the attendance machine.
  *
+ * Requirements:
+ * - Pure PHP (no frameworks)
+ * - PHP cURL extension
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -15,15 +19,16 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_userinfo';
 
 // 2. Prepare Data
 $data = [
-    'trans_id' => '1',
+    'trans_id' => (string)time(),
     'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN to retrieve. Leave empty or omit if supported to get all.
+    'pin'      => '101' // PIN to retrieve.
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -41,7 +46,7 @@ $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
     $result = json_decode($response, true);
 
@@ -53,15 +58,31 @@ if (curl_errno($ch)) {
         echo "Request successful. The machine will send the user data to your Webhook URL.\n";
     } else {
         echo "Failed to request data.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Raw Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
 
 /*
-Note: Fingerspot API often works asynchronously for "Get Userinfo".
+Note: Fingerspot API works asynchronously for "Get Userinfo".
 The API call initiates the request, and the machine pushes the actual
 user data back to your server via the configured Webhook.
+
+Example Request Body:
+------------------------------------------------------------
+{
+    "trans_id": "1710000000",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response (Success):
+------------------------------------------------------------
+{
+    "status": true,
+    "message": "Success"
+}
 */
 ?>
