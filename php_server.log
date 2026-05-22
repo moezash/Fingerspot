@@ -1,0 +1,22 @@
+[Fri May 22 15:35:13 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Fri May 22 15:35:15 2026] [::1]:34008 Accepted
+[Fri May 22 15:35:15 2026] [::1]:34008 [200]: HEAD /index.php
+[Fri May 22 15:35:15 2026] [::1]:34008 Closing
+[Fri May 22 15:36:52 2026] [::1]:57290 Accepted
+[Fri May 22 15:36:53 2026] [::1]:57290 [200]: GET /index.php?page=dashboard
+[Fri May 22 15:36:53 2026] [::1]:57290 Closing
+[Fri May 22 15:36:53 2026] [::1]:57292 Accepted
+[Fri May 22 15:36:53 2026] [::1]:57292 [200]: GET /assets/style.css
+[Fri May 22 15:36:53 2026] [::1]:57292 Closing
+[Fri May 22 15:36:54 2026] [::1]:57306 Accepted
+[Fri May 22 15:36:55 2026] [::1]:57306 [200]: GET /index.php?page=employees
+[Fri May 22 15:36:55 2026] [::1]:57306 Closing
+[Fri May 22 15:36:55 2026] [::1]:57314 Accepted
+[Fri May 22 15:36:55 2026] [::1]:57314 [200]: GET /assets/style.css
+[Fri May 22 15:36:55 2026] [::1]:57314 Closing
+[Fri May 22 15:36:55 2026] [::1]:57316 Accepted
+[Fri May 22 15:36:55 2026] [::1]:57316 [200]: GET /index.php?page=devices
+[Fri May 22 15:36:55 2026] [::1]:57316 Closing
+[Fri May 22 15:36:55 2026] [::1]:57320 Accepted
+[Fri May 22 15:36:55 2026] [::1]:57320 [200]: GET /assets/style.css
+[Fri May 22 15:36:55 2026] [::1]:57320 Closing

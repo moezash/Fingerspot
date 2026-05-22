@@ -10,7 +10,7 @@ Task 2/
 │   ├── auth/             # Authentication & Header setup
 │   ├── devices/          # Device listing & status
 │   ├── attendance/       # Retrieving scan logs
-│   ├── users/            # CRUD operations for employees
+│   ├── users/            # CRUD operations for employees & Registration
 │   ├── sync/             # Machine commands (Time sync, Restart)
 │   └── webhook/          # Real-time data processing
 │
@@ -18,8 +18,9 @@ Task 2/
 │   ├── index.php         # Main UI & Controller
 │   ├── config.php        # API Credentials
 │   ├── functions.php     # Reusable API wrapper functions
-│   └── assets/           # Optional styles/images
+│   └── assets/           # CSS and static files
 │
+├── endpoints.txt         # Compiled list of main API endpoints
 └── README.md             # Documentation
 ```
 
@@ -27,7 +28,7 @@ Task 2/
 
 The following main features and endpoints have been implemented:
 
-1.  **Authentication**: Bearer token implementation required for all requests.
+1.  **Authentication**: Bearer token implementation required for all requests (`sample-code/auth/auth.php`).
 2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
 3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
 4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
@@ -57,10 +58,14 @@ Each file in the `sample-code/` directory is designed to be self-contained and b
 ### 2. Mini Demo App
 The Attendance Monitoring Dashboard provides a visual way to interact with multiple features at once.
 1. Configure your credentials in `mini-demo-app/config.php`.
-2. Host the folder on a PHP-enabled server (e.g., Apache, Nginx, or PHP Built-in server).
+2. Host the folder on a PHP-enabled server.
 3. Access `index.php` in your browser.
+4. **Features included in Demo**:
+   - Dashboard: Filter and view attendance logs by device and date.
+   - Employee Management: Add or Delete employees from specific devices.
+   - Device List: Real-time status overview of all registered machines.
 
 ## Important Notes
 - All API requests use **POST** and send data in **JSON** format.
 - A `trans_id` is required in most requests to track the communication.
-- Some commands are asynchronous; the result will be sent back via your configured **Webhook**.
+- SSL Verification is enabled by default for security. For local development with certificate issues, refer to the comments in the source code.
