@@ -20,6 +20,11 @@ export {
   computeEmployeeStats,
 } from "./employee-helpers";
 export {
+  applyDeviceListParams,
+  buildDeviceListMeta,
+  computeDeviceStats,
+} from "./device-helpers";
+export {
   computeAttendanceStats,
   filterAttendanceLogs,
   filterLogsByDateRange,
@@ -31,6 +36,7 @@ export {
   validateAttlogRequest,
 } from "./attendance-helpers";
 export { buildUrl, type QueryParamValue } from "./build-url";
+export { generateTransId } from "./trans-id";
 export { normalizeApiError, toApiError } from "./normalize-api-error";
 export { notImplemented } from "./not-implemented";
 export { registerApiClientInterceptors } from "./register-interceptors";

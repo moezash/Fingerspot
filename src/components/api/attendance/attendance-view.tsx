@@ -5,6 +5,7 @@ import { RefreshCw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { APIStatusIndicator, ContentSection, PageHeader } from "@/components/shared";
+import { env } from "@/config/env";
 import { useAttendance } from "@/hooks/use-attendance";
 
 import { AttendanceDirectory } from "./attendance-directory";
@@ -36,6 +37,8 @@ export function AttendanceView() {
     [isLoading, stats, validationError]
   );
 
+  const apiStatus = env.isFingerspotConfigured ? "connected" : "checking";
+
   return (
     <div className="flex flex-col gap-10">
       <PageHeader
@@ -43,7 +46,7 @@ export function AttendanceView() {
         title="Attendance"
         description="Review fingerprint attendance logs from the Fingerspot get_attlog API. Requests require trans_id, cloud_id, and a maximum 2-day date range."
       >
-        <APIStatusIndicator status="checking" />
+        <APIStatusIndicator status={apiStatus} />
         <Button
           variant="outline"
           size="sm"

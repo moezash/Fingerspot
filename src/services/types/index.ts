@@ -22,6 +22,8 @@ export type {
   Device,
   DeviceListParams,
   DeviceListResponse,
+  DeviceStats,
+  DeviceStatus,
 } from "./devices";
 export type {
   Employee,

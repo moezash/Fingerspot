@@ -17,6 +17,10 @@ export const API_PATHS = {
   devices: {
     root: "/devices",
     byId: (id: string) => `/devices/${id}`,
+    /** Fingerspot device list endpoint (Bearer token required). */
+    getDevice: "/get_device",
+    /** Fingerspot device restart endpoint (Bearer token required). */
+    restartDevice: "/restart_device",
   },
   logs: {
     root: "/logs",
