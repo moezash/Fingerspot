@@ -2,6 +2,7 @@ import { env } from "@/config/env";
 import { API_PATHS } from "@/config/api-paths";
 
 import { toDateInputValue } from "../helpers/attendance-helpers";
+import { getSelectedCloudId } from "../config/device-config";
 import { attendanceService } from "./attendance.service";
 import { devicesService } from "./devices.service";
 import { employeesService } from "./employees.service";
@@ -11,16 +12,14 @@ import type { DashboardOverview } from "../types/dashboard";
 export const dashboardPaths = API_PATHS.dashboard;
 
 /**
- * Builds the AttlogRequestParams needed to fetch today's attendance.
- *
- * Uses NEXT_PUBLIC_FP_CLOUD_ID when configured, falls back to the demo
- * cloud_id so the mock source returns data in development.
+ * Builds AttlogRequestParams for today's attendance.
+ * cloud_id comes from the selected device context, not a global env var.
  */
 function getTodayAttlogParams() {
   const today = toDateInputValue(new Date());
   return {
     trans_id: env.isFingerspotConfigured ? "auto" : "DEMO-TRANS-001",
-    cloud_id: env.fingerspotCloudId ?? "DEMO-CLOUD-001",
+    cloud_id: getSelectedCloudId() ?? "DEMO-CLOUD-001",
     start_date: today,
     end_date: today,
   };

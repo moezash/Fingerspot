@@ -7,6 +7,7 @@ export {
   DashboardGridMain,
 } from "./dashboard-grid";
 export { EmptyState } from "./empty-state";
+export { IntegrationStatus } from "./integration-status";
 export { LoadingState } from "./loading-state";
 export { PageContainer } from "./page-container";
 export { PageHeader } from "./page-header";

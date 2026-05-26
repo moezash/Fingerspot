@@ -42,5 +42,5 @@ export const navGroups: NavGroup[] = [
 ];
 
 export const footerNavItems: NavItem[] = [
-  { title: "Settings", href: "/settings", icon: Settings },
+  { title: "Settings", href: "/settings/integration", icon: Settings },
 ];

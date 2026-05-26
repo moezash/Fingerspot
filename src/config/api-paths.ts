@@ -21,6 +21,8 @@ export const API_PATHS = {
     getDevice: "/get_device",
     /** Fingerspot device restart endpoint (Bearer token required). */
     restartDevice: "/restart_device",
+    /** Fingerspot device time sync endpoint (Bearer token required). */
+    setTime: "/set_time",
   },
   logs: {
     root: "/logs",

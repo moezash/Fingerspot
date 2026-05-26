@@ -4,6 +4,7 @@ import { API_PATHS } from "@/config/api-paths";
 import { computeDeviceStats } from "../helpers/device-helpers";
 import { generateTransId } from "../helpers/trans-id";
 import { fingerspotClient } from "../fingerspot-client";
+import { getSelectedCloudId } from "../config/device-config";
 import { fetchDevicesFromApi } from "../mocks/fingerspot-device.source";
 import { fetchDevicesFromMock } from "../mocks/devices.source";
 import type { ApiResponse } from "../types/common";
@@ -17,27 +18,26 @@ import type {
 export const devicesPaths = API_PATHS.devices;
 
 /**
- * Devices service — POST /get_device + POST /restart_device integration.
+ * Devices service — POST /get_device + POST /restart_device + POST /set_time.
  *
  * Source selection:
  *   - Live API: when NEXT_PUBLIC_FP_BASE_URL + NEXT_PUBLIC_FP_API_TOKEN are set.
  *   - Mock:     fallback for local development without credentials.
  *
- * The hook and UI are unaware of which source is active.
- * Bearer token auth is handled by the Fingerspot client interceptor.
- * cloud_id is read from the device record and never hardcoded.
+ * cloud_id for list operations comes from the selected device context
+ * (device-config.ts). For device actions (restart/syncTime), cloud_id
+ * comes from the Device record itself — never hardcoded.
  */
 export const devicesService = {
   async list(params?: DeviceListParams): Promise<DeviceListResponse> {
     if (env.isFingerspotConfigured) {
-      const cloudId = env.fingerspotCloudId ?? "";
+      const cloudId = getSelectedCloudId() ?? "";
       return fetchDevicesFromApi(cloudId, params);
     }
     return fetchDevicesFromMock(params);
   },
 
   async getStats(): Promise<ApiResponse<DeviceStats>> {
-    // Fetch the full unfiltered list so stats always reflect the total fleet
     const { data } = await devicesService.list();
     return { data: computeDeviceStats(data) };
   },
@@ -55,16 +55,10 @@ export const devicesService = {
 
   /**
    * Sends a restart command to the specified device via POST /restart_device.
-   *
-   * In mock mode (no Fingerspot credentials) the call is simulated so the
-   * confirmation flow can be exercised locally without a live device.
-   *
-   * @param sn      - Device serial number
-   * @param cloudId - Cloud ID the device belongs to (taken from the device record)
+   * cloud_id comes from the Device record — not from global config.
    */
   async restart(sn: string, cloudId: string): Promise<void> {
     if (!env.isFingerspotConfigured) {
-      // Simulate network latency in mock mode
       await new Promise((resolve) => setTimeout(resolve, 800));
       return;
     }
@@ -73,6 +67,30 @@ export const devicesService = {
       trans_id: generateTransId(),
       cloud_id: cloudId.trim(),
       sn: sn.trim(),
+    });
+  },
+
+  /**
+   * Synchronises the current system time to the specified device via
+   * POST /set_time. cloud_id comes from the Device record.
+   */
+  async syncTime(sn: string, cloudId: string): Promise<void> {
+    if (!env.isFingerspotConfigured) {
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      return;
+    }
+
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const datetime =
+      `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())} ` +
+      `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+    await fingerspotClient.post(devicesPaths.setTime, {
+      trans_id: generateTransId(),
+      cloud_id: cloudId.trim(),
+      sn: sn.trim(),
+      datetime,
     });
   },
 };

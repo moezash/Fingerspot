@@ -1,4 +1,5 @@
 import { env } from "@/config/env";
+import { getSelectedCloudId } from "@/services/config/device-config";
 import { getDefaultAttlogDateRange } from "@/services/helpers/attendance-helpers";
 
 export type AttendanceFilters = {
@@ -13,10 +14,11 @@ export function getDefaultAttendanceFilters(): AttendanceFilters {
   const { start_date, end_date } = getDefaultAttlogDateRange();
 
   return {
-    // When the live API is active, trans_id is auto-generated per-request
-    // by the service layer. The field is kept for mock compatibility.
+    // trans_id is auto-generated per-request by the service layer when live.
+    // The field is kept for mock compatibility.
     trans_id: env.isFingerspotConfigured ? "auto" : "",
-    cloud_id: env.fingerspotCloudId ?? "",
+    // cloud_id comes from the selected device context, not a global env var.
+    cloud_id: getSelectedCloudId() ?? "",
     start_date,
     end_date,
     search: "",
