@@ -2,7 +2,8 @@
 /**
  * Sample code for Deleting User Information from Fingerspot Device
  *
- * This sample demonstrates how to delete an employee from the machine.
+ * This sample demonstrates how to remotely delete an employee record
+ * from the attendance machine.
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -14,7 +15,7 @@ $apiUrl   = 'https://developer.fingerspot.io/api/delete_userinfo';
 
 // 2. Prepare Data
 $data = [
-    'trans_id' => '1',
+    'trans_id' => (string)time(),
     'cloud_id' => $cloudId,
     'pin'      => '101' // PIN of the employee to delete
 ];
@@ -22,7 +23,8 @@ $data = [
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -33,21 +35,20 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 // 6. Execute Request
 $response = curl_exec($ch);
 
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo "cURL Error: " . curl_error($ch) . "\n";
 } else {
     $result = json_decode($response, true);
-
     echo "--- Delete User Sample ---\n";
-    echo "Deleting PIN: " . $data['pin'] . "\n";
+    echo "Request to delete PIN: " . $data['pin'] . "\n";
 
     if ($result && isset($result['status']) && $result['status']) {
-        echo "Delete command sent successfully.\n";
+        echo "Delete command sent successfully to the machine.\n";
     } else {
         echo "Failed to send delete command.\n";
         echo "Response: " . $response . "\n";
@@ -55,4 +56,21 @@ if (curl_errno($ch)) {
 }
 
 curl_close($ch);
+
+/*
+Example Request Body:
+--------------------
+{
+    "trans_id": "1705824000",
+    "cloud_id": "FTV123456",
+    "pin": "101"
+}
+
+Example Response:
+--------------------
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>

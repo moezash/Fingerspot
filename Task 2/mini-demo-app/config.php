@@ -4,14 +4,14 @@
  */
 
 // API Credentials
-// Replace with your actual Fingerspot API Token
+// Get your API Token from https://developer.fingerspot.io
 define('API_TOKEN', 'YOUR_API_TOKEN_HERE');
 
 // Base API URL
 define('API_URL', 'https://developer.fingerspot.io/api');
 
 // App Settings
-define('APP_NAME', 'Attendance Monitor');
+define('APP_NAME', 'Attendance Monitor Dashboard');
 
 // Error reporting
 error_reporting(E_ALL);

@@ -1,6 +1,6 @@
 # Task 2: Fingerspot API Integration & Sample Code
 
-This folder contains the results of the Task 2 internship project, focused on integrating with the Fingerspot Cloud API.
+This folder contains the results of the Task 2 internship project, focused on integrating with the Fingerspot Cloud API using pure PHP and cURL.
 
 ## Project Structure
 
@@ -18,8 +18,9 @@ Task 2/
 │   ├── index.php         # Main UI & Controller
 │   ├── config.php        # API Credentials
 │   ├── functions.php     # Reusable API wrapper functions
-│   └── assets/           # Optional styles/images
+│   └── assets/           # Professional CSS styles
 │
+├── endpoints.txt         # Compiled list of main API endpoints
 └── README.md             # Documentation
 ```
 
@@ -41,7 +42,7 @@ The following main features and endpoints have been implemented:
 
 - PHP 7.4 or higher
 - PHP cURL extension enabled
-- Valid Fingerspot API Token and Cloud ID
+- Valid Fingerspot API Token and Cloud ID from [developer.fingerspot.io](https://developer.fingerspot.io)
 
 ## How to Use
 
@@ -49,7 +50,7 @@ The following main features and endpoints have been implemented:
 Each file in the `sample-code/` directory is designed to be self-contained and beginner-friendly.
 1. Open the desired PHP file.
 2. Replace `YOUR_API_TOKEN_HERE` and `YOUR_CLOUD_ID_HERE` with your actual credentials.
-3. Run the script via terminal or browser:
+3. Run the script via terminal:
    ```bash
    php sample-code/attendance/get-attendance.php
    ```
@@ -57,7 +58,7 @@ Each file in the `sample-code/` directory is designed to be self-contained and b
 ### 2. Mini Demo App
 The Attendance Monitoring Dashboard provides a visual way to interact with multiple features at once.
 1. Configure your credentials in `mini-demo-app/config.php`.
-2. Host the folder on a PHP-enabled server (e.g., Apache, Nginx, or PHP Built-in server).
+2. Host the folder on a PHP-enabled server.
 3. Access `index.php` in your browser.
 
 ## Important Notes

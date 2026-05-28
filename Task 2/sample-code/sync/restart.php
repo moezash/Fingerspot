@@ -2,6 +2,9 @@
 /**
  * Sample code for Restarting Machine Remotely
  *
+ * This script sends a remote system reboot command to the
+ * attendance machine.
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -12,14 +15,15 @@ $apiUrl   = 'https://developer.fingerspot.io/api/restart';
 
 // 2. Prepare Data
 $data = [
-    'trans_id' => '1',
+    'trans_id' => (string)time(),
     'cloud_id' => $cloudId
 ];
 
 // 3. Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -29,12 +33,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 $response = curl_exec($ch);
 
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo "cURL Error: " . curl_error($ch) . "\n";
 } else {
     $result = json_decode($response, true);
     echo "--- Restart Machine Sample ---\n";

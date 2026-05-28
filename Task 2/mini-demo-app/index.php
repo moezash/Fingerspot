@@ -47,16 +47,8 @@ if ($selected_device) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo APP_NAME; ?></title>
-    <!-- Simple CSS for the dashboard -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { height: 100vh; background: #343a40; color: white; padding-top: 20px; }
-        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 10px 20px; }
-        .sidebar a:hover, .sidebar a.active { color: white; background: #495057; }
-        .main-content { padding: 20px; }
-        .card { margin-bottom: 20px; border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
-    </style>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -79,27 +71,31 @@ if ($selected_device) {
                 <?php endif; ?>
 
                 <?php if ($page == 'dashboard'): ?>
-                    <h2>Attendance Dashboard (Today)</h2>
+                    <h4>Dashboard</h4>
                     <div class="row mb-4">
-                        <div class="col-md-4">
-                            <form method="GET" class="d-flex">
-                                <input type="hidden" name="page" value="dashboard">
-                                <select name="device" class="form-select me-2">
-                                    <option value="">Select Device</option>
-                                    <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
-                                        <?php foreach ($devices['data'] as $dev): ?>
-                                            <option value="<?php echo $dev['cloud_id']; ?>" <?php echo $selected_device == $dev['cloud_id'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($dev['name']); ?> (<?php echo $dev['cloud_id']; ?>)
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                                <button type="submit" class="btn btn-primary">Filter</button>
-                            </form>
+                        <div class="col-md-6">
+                            <div class="card p-3">
+                                <form method="GET" class="d-flex align-items-center">
+                                    <input type="hidden" name="page" value="dashboard">
+                                    <label for="device_filter" class="me-2 text-nowrap">Filter by Device:</label>
+                                    <select name="device" id="device_filter" class="form-select me-2">
+                                        <option value="">Select Device</option>
+                                        <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
+                                            <?php foreach ($devices['data'] as $dev): ?>
+                                                <option value="<?php echo $dev['cloud_id']; ?>" <?php echo $selected_device == $dev['cloud_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($dev['name']); ?> (<?php echo $dev['cloud_id']; ?>)
+                                                </option>
+                                            <?php endforeach; ?>
+                                        <?php endif; ?>
+                                    </select>
+                                    <button type="submit" class="btn btn-primary">Filter</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
 
                     <div class="card">
+                        <div class="card-header">Attendance Logs (Today)</div>
                         <div class="card-body">
                             <table class="table table-hover">
                                 <thead>
@@ -129,7 +125,7 @@ if ($selected_device) {
                     </div>
 
                 <?php elseif ($page == 'employees'): ?>
-                    <h2>Employee Management</h2>
+                    <h4>Employee Management</h4>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="card">
@@ -138,8 +134,8 @@ if ($selected_device) {
                                     <form method="POST">
                                         <input type="hidden" name="action" value="add_employee">
                                         <div class="mb-3">
-                                            <label class="form-label">Device</label>
-                                            <select name="cloud_id" class="form-select" required>
+                                            <label for="cloud_id" class="form-label">Device</label>
+                                            <select name="cloud_id" id="cloud_id" class="form-select" required>
                                                 <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
                                                     <?php foreach ($devices['data'] as $dev): ?>
                                                         <option value="<?php echo $dev['cloud_id']; ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
@@ -148,12 +144,12 @@ if ($selected_device) {
                                             </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">PIN</label>
-                                            <input type="text" name="pin" class="form-control" required>
+                                            <label for="pin" class="form-label">PIN</label>
+                                            <input type="text" name="pin" id="pin" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" name="name" class="form-control" required>
+                                            <label for="name" class="form-label">Full Name</label>
+                                            <input type="text" name="name" id="name" class="form-control" required>
                                         </div>
                                         <button type="submit" class="btn btn-success w-100">Send to Machine</button>
                                     </form>
@@ -162,15 +158,15 @@ if ($selected_device) {
                         </div>
                         <div class="col-md-8">
                             <div class="card">
-                                <div class="card-header">Actions</div>
+                                <div class="card-header">Advanced Actions</div>
                                 <div class="card-body">
-                                    <p>Use the form on the left to add employees to the machine.</p>
-                                    <hr>
-                                    <h5>Delete Employee</h5>
+                                    <h5>Delete Employee from Device</h5>
+                                    <p class="text-muted small">This will remotely remove the user record from the machine.</p>
                                     <form method="POST" class="row g-3">
                                         <input type="hidden" name="action" value="delete_employee">
                                         <div class="col-md-5">
-                                            <select name="cloud_id" class="form-select" required>
+                                            <label for="del_cloud_id" class="visually-hidden">Device</label>
+                                            <select name="cloud_id" id="del_cloud_id" class="form-select" required>
                                                 <option value="">Select Device</option>
                                                 <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
                                                     <?php foreach ($devices['data'] as $dev): ?>
@@ -180,7 +176,8 @@ if ($selected_device) {
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="text" name="pin" class="form-control" placeholder="PIN" required>
+                                            <label for="del_pin" class="visually-hidden">PIN</label>
+                                            <input type="text" name="pin" id="del_pin" class="form-control" placeholder="PIN" required>
                                         </div>
                                         <div class="col-md-3">
                                             <button type="submit" class="btn btn-danger w-100">Delete</button>
@@ -192,7 +189,7 @@ if ($selected_device) {
                     </div>
 
                 <?php elseif ($page == 'devices'): ?>
-                    <h2>Device Status</h2>
+                    <h4>Device Status</h4>
                     <div class="card">
                         <div class="card-body">
                             <table class="table">
@@ -215,7 +212,7 @@ if ($selected_device) {
                                                     <form method="POST" style="display:inline;">
                                                         <input type="hidden" name="action" value="sync_time">
                                                         <input type="hidden" name="cloud_id" value="<?php echo $dev['cloud_id']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Sync Time</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary">Sync Time</button>
                                                     </form>
                                                 </td>
                                             </tr>

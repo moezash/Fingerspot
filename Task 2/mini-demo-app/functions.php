@@ -1,6 +1,6 @@
 <?php
 /**
- * Utility functions for Fingerspot Mini Demo App
+ * Reusable API helper functions for Fingerspot Mini Demo App
  */
 require_once 'config.php';
 
@@ -11,7 +11,7 @@ require_once 'config.php';
  * @param array $data The data to send in the request body
  * @return array The decoded JSON response
  */
-function fingerspot_request($endpoint, $data = []) {
+function fingerspot_api_request($endpoint, $data = []) {
     $url = API_URL . '/' . $endpoint;
 
     // Ensure trans_id is present
@@ -21,7 +21,8 @@ function fingerspot_request($endpoint, $data = []) {
 
     $headers = [
         'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     $ch = curl_init($url);
@@ -29,7 +30,9 @@ function fingerspot_request($endpoint, $data = []) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    // Safety: SSL verification enabled for production security
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
     $response = curl_exec($ch);
@@ -37,29 +40,37 @@ function fingerspot_request($endpoint, $data = []) {
     curl_close($ch);
 
     if ($error) {
-        return ['status' => false, 'message' => "cURL Error: $error"];
+        return [
+            'status' => false,
+            'success' => false,
+            'message' => "cURL Error: $error"
+        ];
     }
 
     $decoded = json_decode($response, true);
     if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+        return [
+            'status' => false,
+            'success' => false,
+            'message' => "Invalid JSON response from API"
+        ];
     }
 
     return $decoded;
 }
 
 /**
- * Get the list of devices
+ * Retrieve the list of devices
  */
 function get_devices() {
-    return fingerspot_request('get_device');
+    return fingerspot_api_request('get_device');
 }
 
 /**
- * Get attendance logs for a device
+ * Retrieve attendance logs for a specific device and date range
  */
 function get_attendance($cloud_id, $start_date, $end_date) {
-    return fingerspot_request('get_attlog', [
+    return fingerspot_api_request('get_attlog', [
         'cloud_id' => $cloud_id,
         'start_date' => $start_date,
         'end_date' => $end_date
@@ -67,10 +78,10 @@ function get_attendance($cloud_id, $start_date, $end_date) {
 }
 
 /**
- * Add a new employee to a device
+ * Add a new employee to a machine
  */
 function add_employee($cloud_id, $pin, $name) {
-    return fingerspot_request('set_userinfo', [
+    return fingerspot_api_request('set_userinfo', [
         'cloud_id' => $cloud_id,
         'pin' => $pin,
         'name' => $name,
@@ -79,20 +90,20 @@ function add_employee($cloud_id, $pin, $name) {
 }
 
 /**
- * Delete an employee from a device
+ * Remove an employee from a machine
  */
 function delete_employee($cloud_id, $pin) {
-    return fingerspot_request('delete_userinfo', [
+    return fingerspot_api_request('delete_userinfo', [
         'cloud_id' => $cloud_id,
         'pin' => $pin
     ]);
 }
 
 /**
- * Sync device time
+ * Remote sync machine time
  */
 function sync_time($cloud_id) {
-    return fingerspot_request('set_time', [
+    return fingerspot_api_request('set_time', [
         'cloud_id' => $cloud_id
     ]);
 }

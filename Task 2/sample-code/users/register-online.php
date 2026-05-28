@@ -2,8 +2,8 @@
 /**
  * Sample code for Remote Registration (Register Online)
  *
- * This sample demonstrates how to trigger the machine to start
- * a registration process for a specific user.
+ * This sample demonstrates how to trigger the machine's registration
+ * UI for a specific user and template type.
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -15,16 +15,17 @@ $apiUrl   = 'https://developer.fingerspot.io/api/reg_online';
 
 // 2. Prepare Data
 $data = [
-    'trans_id'     => '1',
+    'trans_id'     => (string)time(),
     'cloud_id'     => $cloudId,
     'pin'          => '101',
-    'verification' => '0' // 0-10: Finger, 12: Face, 13: Vein
+    'verification' => '0' // 0-9: Fingers, 12: Face, 13: Vein, 14: Palm
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -35,21 +36,20 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 // 6. Execute Request
 $response = curl_exec($ch);
 
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo "cURL Error: " . curl_error($ch) . "\n";
 } else {
     $result = json_decode($response, true);
-
     echo "--- Register Online Sample ---\n";
     echo "Triggering registration for PIN " . $data['pin'] . " (Mode: " . $data['verification'] . ")\n";
 
     if ($result && isset($result['status']) && $result['status']) {
-        echo "Command successful. Machine is now in registration mode.\n";
+        echo "Command successful. Machine is now waiting for user input.\n";
     } else {
         echo "Failed to trigger registration.\n";
         echo "Response: " . $response . "\n";
