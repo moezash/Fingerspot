@@ -5,6 +5,10 @@
  * This sample demonstrates how to set up the authentication headers
  * required for every request to the Fingerspot API.
  *
+ * Requirements:
+ * - PHP cURL extension enabled
+ * - Valid API Token from developer.fingerspot.io
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -14,9 +18,11 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 
 // 2. Prepare Headers
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
+// and use Content-Type: application/json.
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
@@ -28,17 +34,31 @@ function testAuthentication($url, $headers) {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+
+    /**
+     * CURLOPT_SSL_VERIFYPEER should be set to true in production for security.
+     * Setting it to false is strictly for local development troubleshooting only.
+     */
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+    if (curl_errno($ch)) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        return [
+            'success' => false,
+            'message' => "cURL Error: $error"
+        ];
+    }
+
     curl_close($ch);
 
     return [
         'code' => $httpCode,
-        'response' => $response
+        'response' => json_decode($response, true)
     ];
 }
 
@@ -53,10 +73,11 @@ echo "\nNote: This is a configuration sample. Use these headers in all your API 
 
 /*
 Example Request Headers:
-GET /api/get_device HTTP/1.1
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 Example Response (if token is invalid):
 {
@@ -67,6 +88,7 @@ Example Response (if token is invalid):
 Example Response (if token is valid):
 {
     "status": true,
+    "message": "Success",
     "data": [...]
 }
 */
