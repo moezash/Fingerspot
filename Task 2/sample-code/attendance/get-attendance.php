@@ -15,7 +15,7 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_attlog';
 
 // 2. Prepare Data
 $data = [
-    'trans_id'   => '1',                // Unique ID for this request
+    'trans_id'   => (string)time(),     // Unique ID for this request
     'cloud_id'   => $cloudId,           // Device Cloud ID
     'start_date' => date('Y-m-d'),      // Start date (YYYY-MM-DD)
     'end_date'   => date('Y-m-d')       // End date (YYYY-MM-DD)
@@ -24,7 +24,8 @@ $data = [
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -35,7 +36,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+/**
+ * CURLOPT_SSL_VERIFYPEER is set to true for production security.
+ * Setting it to false is strictly for local development troubleshooting only.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 // 6. Execute Request
 $response = curl_exec($ch);
@@ -77,12 +83,13 @@ POST /api/get_attlog HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1",
+    "trans_id": "1704067200",
     "cloud_id": "FTV123456",
     "start_date": "2024-01-01",
-    "end_date": "2024-01-07"
+    "end_date": "2024-01-02"
 }
 
 Example Response (Success):
