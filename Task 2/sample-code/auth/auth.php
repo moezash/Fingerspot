@@ -5,6 +5,10 @@
  * This sample demonstrates how to set up the authentication headers
  * required for every request to the Fingerspot API.
  *
+ * Requirements:
+ * - Pure PHP + cURL
+ * - No frameworks
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -16,7 +20,8 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
@@ -28,17 +33,30 @@ function testAuthentication($url, $headers) {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+
+    // Fingerspot API expects POST for most operations
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['trans_id' => '1']));
+
+    // Security setting: In production, always set CURLOPT_SSL_VERIFYPEER to true.
+    // Setting it to false is strictly for local development troubleshooting only.
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+    if (curl_errno($ch)) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        return ['error' => $error];
+    }
+
     curl_close($ch);
 
     return [
         'code' => $httpCode,
-        'response' => $response
+        'response' => json_decode($response, true)
     ];
 }
 
@@ -52,21 +70,28 @@ foreach ($headers as $header) {
 echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
 
 /*
-Example Request Headers:
-GET /api/get_device HTTP/1.1
+Example Request:
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
+
+{
+    "trans_id": "1"
+}
 
 Example Response (if token is invalid):
 {
-    "status": false,
+    "success": false,
+    "error_code": "401",
     "message": "Unauthorized"
 }
 
 Example Response (if token is valid):
 {
-    "status": true,
+    "success": true,
+    "message": "Success",
     "data": [...]
 }
 */
