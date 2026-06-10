@@ -5,6 +5,10 @@
  * This sample demonstrates how to set up the authentication headers
  * required for every request to the Fingerspot API.
  *
+ * Requirements:
+ * - PHP cURL extension
+ * - Valid API Token from developer.fingerspot.io
+ *
  * Documentation: https://developer.fingerspot.io
  */
 
@@ -14,13 +18,19 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 
 // 2. Prepare Headers
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
+// and define the content type as application/json.
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
  * Helper function to demonstrate how headers are used in a cURL request
+ *
+ * @param string $url The endpoint URL
+ * @param array $headers The array of HTTP headers
+ * @return array The HTTP response code and body
  */
 function testAuthentication($url, $headers) {
     $ch = curl_init($url);
@@ -28,11 +38,20 @@ function testAuthentication($url, $headers) {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+
+    // SSL Verification:
+    // For production, always set to true. Use false only for local development troubleshooting.
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch)) {
+        $error = curl_error($ch);
+        curl_close($ch);
+        return ['error' => $error];
+    }
 
     curl_close($ch);
 
@@ -49,7 +68,8 @@ foreach ($headers as $header) {
     echo "- $header\n";
 }
 
-echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
+echo "\nUsage Example:\n";
+echo "curl_setopt(\$ch, CURLOPT_HTTPHEADER, \$headers);\n";
 
 /*
 Example Request Headers:
@@ -57,16 +77,18 @@ GET /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 Example Response (if token is invalid):
 {
-    "status": false,
+    "success": false,
+    "error_code": "401",
     "message": "Unauthorized"
 }
 
 Example Response (if token is valid):
 {
-    "status": true,
+    "success": true,
     "data": [...]
 }
 */
