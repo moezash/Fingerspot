@@ -14,14 +14,15 @@ require_once 'config.php';
 function fingerspot_request($endpoint, $data = []) {
     $url = API_URL . '/' . $endpoint;
 
-    // Ensure trans_id is present
+    // Ensure trans_id is present and use uniqid() for better collision avoidance
     if (!isset($data['trans_id'])) {
-        $data['trans_id'] = (string)time();
+        $data['trans_id'] = uniqid();
     }
 
     $headers = [
         'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     $ch = curl_init($url);
@@ -29,7 +30,13 @@ function fingerspot_request($endpoint, $data = []) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    /**
+     * SECURITY NOTE:
+     * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+     * Setting it to false is strictly for local development troubleshooting only.
+     */
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
     $response = curl_exec($ch);
@@ -42,7 +49,13 @@ function fingerspot_request($endpoint, $data = []) {
 
     $decoded = json_decode($response, true);
     if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+        return ['status' => false, 'message' => "Invalid JSON response from API."];
+    }
+
+    // Fingerspot API may use 'status' or 'success' as the success indicator
+    $isSuccess = (isset($decoded['status']) && $decoded['status']) || (isset($decoded['success']) && $decoded['success']);
+    if (!isset($decoded['status'])) {
+        $decoded['status'] = $isSuccess;
     }
 
     return $decoded;
