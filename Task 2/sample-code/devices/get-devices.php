@@ -15,7 +15,8 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_device'; // Endpoint to get
 // 2. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 3. Initialize cURL
@@ -24,13 +25,24 @@ $ch = curl_init($apiUrl);
 // 4. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+/**
+ * SECURITY NOTE:
+ * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+ * Setting this to false is strictly for temporary local troubleshooting only.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
 // Using POST as per Fingerspot API convention for most endpoints
 curl_setopt($ch, CURLOPT_POST, true);
-// Even for listing, a trans_id is often recommended
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'trans_id' => '1'
-]));
+
+// Preparing request body
+// Use uniqid() for trans_id to ensure uniqueness
+$requestBody = [
+    'trans_id' => uniqid()
+];
+
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($requestBody));
 
 // 5. Execute Request
 $response = curl_exec($ch);
@@ -46,13 +58,18 @@ if (curl_errno($ch)) {
     echo "--- Get Device List Sample ---\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
+    if ($result && ((isset($result['status']) && $result['status']) || (isset($result['success']) && $result['success']))) {
         echo "Devices found:\n";
-        foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+        if (isset($result['data']) && is_array($result['data'])) {
+            foreach ($result['data'] as $device) {
+                echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . " | Status: " . ($device['status'] ?? 'Unknown') . "\n";
+            }
+        } else {
+            echo "No device data found in response.\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
+        echo "Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -65,9 +82,10 @@ POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1"
+    "trans_id": "65b2a1c2d3e4f"
 }
 
 Example Response (Success):
