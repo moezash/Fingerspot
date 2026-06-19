@@ -16,7 +16,8 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
@@ -28,11 +29,24 @@ function testAuthentication($url, $headers) {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+
+    /**
+     * SECURITY NOTE:
+     * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+     * This ensures the SSL certificate is verified.
+     *
+     * Only set to false for local development troubleshooting if you encounter
+     * SSL certificate issues. Never use false in a production environment.
+     */
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch)) {
+        echo 'cURL Error: ' . curl_error($ch) . "\n";
+    }
 
     curl_close($ch);
 
@@ -53,10 +67,11 @@ echo "\nNote: This is a configuration sample. Use these headers in all your API 
 
 /*
 Example Request Headers:
-GET /api/get_device HTTP/1.1
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 Example Response (if token is invalid):
 {
