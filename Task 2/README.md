@@ -18,8 +18,9 @@ Task 2/
 │   ├── index.php         # Main UI & Controller
 │   ├── config.php        # API Credentials
 │   ├── functions.php     # Reusable API wrapper functions
-│   └── assets/           # Optional styles/images
+│   └── assets/           # Dashboard styles
 │
+├── endpoints.txt         # Compiled list of main API endpoints
 └── README.md             # Documentation
 ```
 
@@ -27,15 +28,16 @@ Task 2/
 
 The following main features and endpoints have been implemented:
 
-1.  **Authentication**: Bearer token implementation required for all requests.
+1.  **Authentication**: Bearer token implementation required for all requests (`sample-code/auth/auth.php`).
 2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
 3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
 4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
 5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+6.  **Get User Info**: Request user data from the machine (`/api/get_userinfo`).
+7.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
+8.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
+9.  **Restart Machine**: Remote system restart (`/api/restart`).
+10. **Webhook Receiver**: Handling real-time push data for logs and command responses.
 
 ## Requirements
 
@@ -57,10 +59,11 @@ Each file in the `sample-code/` directory is designed to be self-contained and b
 ### 2. Mini Demo App
 The Attendance Monitoring Dashboard provides a visual way to interact with multiple features at once.
 1. Configure your credentials in `mini-demo-app/config.php`.
-2. Host the folder on a PHP-enabled server (e.g., Apache, Nginx, or PHP Built-in server).
+2. Host the folder on a PHP-enabled server.
 3. Access `index.php` in your browser.
 
 ## Important Notes
 - All API requests use **POST** and send data in **JSON** format.
 - A `trans_id` is required in most requests to track the communication.
 - Some commands are asynchronous; the result will be sent back via your configured **Webhook**.
+- The `get_attlog` endpoint has a maximum range of 2 days per request.

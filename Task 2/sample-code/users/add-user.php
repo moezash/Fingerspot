@@ -14,23 +14,22 @@ $cloudId  = 'YOUR_CLOUD_ID_HERE';
 $apiUrl   = 'https://developer.fingerspot.io/api/set_userinfo';
 
 // 2. Prepare User Data
-$data = [
-    'trans_id'  => '1',            // Unique ID for this request
-    'cloud_id'  => $cloudId,       // Device Cloud ID
-    'pin'       => '101',          // Employee PIN / ID
-    'name'      => 'John Doe',     // Employee Name
-    'privilege' => '0',            // 0: User, 1: Admin
-    'password'  => '',             // Device password (optional)
-    'rfid'      => '',             // RFID Card ID (optional)
-    // Templates can be sent here as well if you have the hex/base64 data
-    // 'finger_data' => '...',
-    // 'face_data'   => '...'
+$payload = [
+    'trans_id'  => uniqid('usr_'),     // Unique ID for this request
+    'cloud_id'  => $cloudId,           // Device Cloud ID
+    'pin'       => '101',              // Employee PIN / ID
+    'name'      => 'John Doe',         // Employee Name
+    'privilege' => '0',                // 0: User, 1: Admin
+    'password'  => '',                 // Device password (optional)
+    'rfid'      => ''                  // RFID Card ID (optional)
+    // Additional templates (finger_data, face_data) can be included if available
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -40,8 +39,13 @@ $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+
+/**
+ * Security: Always set CURLOPT_SSL_VERIFYPEER to true in production.
+ * Setting it to false is strictly for local development troubleshooting only.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 // 6. Execute Request
 $response = curl_exec($ch);
@@ -49,21 +53,28 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 // 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
     // 8. Process Response
     $result = json_decode($response, true);
 
     echo "--- Add/Set User Information Sample ---\n";
-    echo "Sending data for PIN: " . $data['pin'] . " (" . $data['name'] . ")\n";
+    echo "Sending data for PIN: " . $payload['pin'] . " (" . $payload['name'] . ")\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
-        echo "Command sent successfully to the machine.\n";
-        echo "Note: The machine will process this command and report the result via Webhook.\n";
+    if ($result === null) {
+        echo "Error: Received invalid JSON response.\n";
     } else {
-        echo "Failed to send command.\n";
-        echo "Response: " . $response . "\n";
+        $isSuccess = (isset($result['status']) && $result['status']) ||
+                     (isset($result['success']) && $result['success']);
+
+        if ($isSuccess) {
+            echo "Command sent successfully to the machine.\n";
+            echo "Note: The machine will process this command and report the result via Webhook.\n";
+        } else {
+            echo "Failed to send command.\n";
+            echo "Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        }
     }
 }
 
@@ -72,7 +83,7 @@ curl_close($ch);
 /*
 Example Request Body:
 {
-    "trans_id": "1",
+    "trans_id": "usr_65a1234567890",
     "cloud_id": "FTV123456",
     "pin": "101",
     "name": "John Doe",

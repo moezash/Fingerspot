@@ -14,14 +14,15 @@ require_once 'config.php';
 function fingerspot_request($endpoint, $data = []) {
     $url = API_URL . '/' . $endpoint;
 
-    // Ensure trans_id is present
+    // Ensure trans_id is present and unique
     if (!isset($data['trans_id'])) {
-        $data['trans_id'] = (string)time();
+        $data['trans_id'] = uniqid('app_');
     }
 
     $headers = [
         'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     $ch = curl_init($url);
@@ -29,7 +30,11 @@ function fingerspot_request($endpoint, $data = []) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    /**
+     * Security: Always set CURLOPT_SSL_VERIFYPEER to true in production.
+     */
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 
     $response = curl_exec($ch);
@@ -42,7 +47,7 @@ function fingerspot_request($endpoint, $data = []) {
 
     $decoded = json_decode($response, true);
     if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+        return ['status' => false, 'message' => "Invalid JSON response from API."];
     }
 
     return $decoded;
@@ -91,9 +96,26 @@ function delete_employee($cloud_id, $pin) {
 /**
  * Sync device time
  */
-function sync_time($cloud_id) {
+function sync_device($cloud_id) {
     return fingerspot_request('set_time', [
         'cloud_id' => $cloud_id
     ]);
+}
+
+/**
+ * Restart device
+ */
+function restart_device($cloud_id) {
+    return fingerspot_request('restart', [
+        'cloud_id' => $cloud_id
+    ]);
+}
+
+/**
+ * Helper to check if API call was successful
+ */
+function is_api_success($result) {
+    return (isset($result['status']) && $result['status']) ||
+           (isset($result['success']) && $result['success']);
 }
 ?>
