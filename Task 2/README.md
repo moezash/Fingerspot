@@ -1,6 +1,6 @@
-# Task 2: Fingerspot API Integration & Sample Code
+# Task 2: Fingerspot Cloud API Integration Samples
 
-This folder contains the results of the Task 2 internship project, focused on integrating with the Fingerspot Cloud API.
+This folder contains the results of the Task 2 internship project, focused on studying the Fingerspot Cloud API and creating professional, runnable PHP sample code for its main features.
 
 ## Project Structure
 
@@ -18,24 +18,25 @@ Task 2/
 │   ├── index.php         # Main UI & Controller
 │   ├── config.php        # API Credentials
 │   ├── functions.php     # Reusable API wrapper functions
-│   └── assets/           # Optional styles/images
+│   └── assets/           # UI Assets (CSS/JS)
 │
-└── README.md             # Documentation
+└── README.md             # This documentation
 ```
 
-## Features Implemented
+## API Endpoints Overview
 
-The following main features and endpoints have been implemented:
+All requests to the Fingerspot Cloud API use the **POST** method and communicate via **JSON**.
 
-1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+| Feature | Endpoint | Description |
+| :--- | :--- | :--- |
+| **Get Device List** | `/api/get_device` | Retrieve all registered devices in your account. |
+| **Get Attendance Logs** | `/api/get_attlog` | Fetch scan data with date range filtering. |
+| **Set User Info** | `/api/set_userinfo` | Add or update employee data on the device. |
+| **Get User Info** | `/api/get_userinfo` | Request user details (Asynchronous via Webhook). |
+| **Delete User Info** | `/api/delete_userinfo` | Remote employee deletion from the device. |
+| **Register Online** | `/api/reg_online` | Trigger remote template registration mode. |
+| **Set Time** | `/api/set_time` | Synchronize machine time/timezone. |
+| **Restart Machine** | `/api/restart` | Remote system reboot. |
 
 ## Requirements
 
@@ -46,21 +47,16 @@ The following main features and endpoints have been implemented:
 ## How to Use
 
 ### 1. Sample Codes
-Each file in the `sample-code/` directory is designed to be self-contained and beginner-friendly.
-1. Open the desired PHP file.
-2. Replace `YOUR_API_TOKEN_HERE` and `YOUR_CLOUD_ID_HERE` with your actual credentials.
-3. Run the script via terminal or browser:
-   ```bash
-   php sample-code/attendance/get-attendance.php
-   ```
+Each file in the `sample-code/` directory is self-contained and includes example request/response blocks.
+1. Open a sample file (e.g., `sample-code/devices/get-devices.php`).
+2. Replace `YOUR_API_TOKEN_HERE` with your actual token.
+3. Run via CLI: `php sample-code/devices/get-devices.php`
 
 ### 2. Mini Demo App
-The Attendance Monitoring Dashboard provides a visual way to interact with multiple features at once.
-1. Configure your credentials in `mini-demo-app/config.php`.
-2. Host the folder on a PHP-enabled server (e.g., Apache, Nginx, or PHP Built-in server).
-3. Access `index.php` in your browser.
+A simple "Attendance Monitoring Dashboard" integrating multiple features.
+1. Configure credentials in `mini-demo-app/config.php`.
+2. Host on a PHP server and access `index.php`.
 
-## Important Notes
-- All API requests use **POST** and send data in **JSON** format.
-- A `trans_id` is required in most requests to track the communication.
-- Some commands are asynchronous; the result will be sent back via your configured **Webhook**.
+## Security Notes
+- `CURLOPT_SSL_VERIFYPEER` is set to `true` by default for production security.
+- Setting it to `false` is only recommended for local development troubleshooting.
