@@ -24,12 +24,21 @@ $ch = curl_init($apiUrl);
 // 4. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-// Using POST as per Fingerspot API convention for most endpoints
+
+/**
+ * SSL Verification
+ * Set CURLOPT_SSL_VERIFYPEER to true for production security.
+ * Setting it to false is strictly for local development troubleshooting only.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+// Using POST as per Fingerspot API convention
 curl_setopt($ch, CURLOPT_POST, true);
-// Even for listing, a trans_id is often recommended
+
+// Fingerspot API requests typically require 'trans_id'
+// We use uniqid() for better collision avoidance
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'trans_id' => '1'
+    'trans_id' => uniqid()
 ]));
 
 // 5. Execute Request
@@ -46,13 +55,19 @@ if (curl_errno($ch)) {
     echo "--- Get Device List Sample ---\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
+    // Fingerspot API indicates success via 'status' or 'success' key
+    if ($result && ((isset($result['status']) && $result['status']) || (isset($result['success']) && $result['success']))) {
         echo "Devices found:\n";
-        foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+        if (isset($result['data']) && is_array($result['data'])) {
+            foreach ($result['data'] as $device) {
+                echo "- SN: " . ($device['cloud_id'] ?? 'N/A') . " | Name: " . ($device['name'] ?? 'N/A') . " | Status: " . ($device['status'] ?? 'Unknown') . "\n";
+            }
+        } else {
+            echo "No device data found in the response.\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
+        echo "Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -67,7 +82,7 @@ Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
 
 {
-    "trans_id": "1"
+    "trans_id": "65b2a1c3e4b5a"
 }
 
 Example Response (Success):
