@@ -23,9 +23,24 @@ Task 2/
 └── README.md             # Documentation
 ```
 
+## Main Fingerspot API Endpoints
+
+The following are the core endpoints available in the Fingerspot Cloud API:
+
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/api/get_device` | POST | Retrieves the list of all registered cloud devices and their status. |
+| `/api/get_attlog` | POST | Fetches attendance scan logs from a device within a specified date range. |
+| `/api/set_userinfo` | POST | Adds or updates employee data (PIN, name, etc.) on the device. |
+| `/api/get_userinfo` | POST | Requests specific employee data from the device (returns via Webhook). |
+| `/api/delete_userinfo` | POST | Deletes employee information from the device. |
+| `/api/reg_online` | POST | Triggers remote registration mode (Face, Finger, etc.) on the device. |
+| `/api/set_time` | POST | Synchronizes the device's date and time. |
+| `/api/restart` | POST | Reboots the device remotely. |
+
 ## Features Implemented
 
-The following main features and endpoints have been implemented:
+The following main features and endpoints have been implemented in this repository:
 
 1.  **Authentication**: Bearer token implementation required for all requests.
 2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
