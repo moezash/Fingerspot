@@ -2,6 +2,21 @@
 
 This folder contains the results of the Task 2 internship project, focused on integrating with the Fingerspot Cloud API.
 
+## Main Endpoints & Features
+
+The following main endpoints from [developer.fingerspot.io](https://developer.fingerspot.io) are identified and implemented in this project:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/get_device` | POST | Retrieve the list of all registered attendance machines and their status. |
+| `/api/get_attlog` | POST | Fetch attendance scan data with date range filtering. |
+| `/api/get_userinfo` | POST | Request detailed user data (PIN, name, templates) from the machine. Results are sent via Webhook. |
+| `/api/set_userinfo` | POST | Upload or update user information (PIN, name, etc.) to the attendance machine. |
+| `/api/delete_userinfo` | POST | Remotely delete a user from the attendance machine. |
+| `/api/reg_online` | POST | Trigger the machine to enter registration mode for various biometric types. |
+| `/api/set_time` | POST | Synchronize the machine's time and timezone. |
+| `/api/restart` | POST | Remotely reboot the attendance machine. |
+
 ## Project Structure
 
 ```text
