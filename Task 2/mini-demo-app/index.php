@@ -47,16 +47,8 @@ if ($selected_device) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo APP_NAME; ?></title>
-    <!-- Simple CSS for the dashboard -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { height: 100vh; background: #343a40; color: white; padding-top: 20px; }
-        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 10px 20px; }
-        .sidebar a:hover, .sidebar a.active { color: white; background: #495057; }
-        .main-content { padding: 20px; }
-        .card { margin-bottom: 20px; border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
-    </style>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -84,7 +76,7 @@ if ($selected_device) {
                         <div class="col-md-4">
                             <form method="GET" class="d-flex">
                                 <input type="hidden" name="page" value="dashboard">
-                                <select name="device" class="form-select me-2">
+                                <select name="device" class="form-select me-2" id="device_select">
                                     <option value="">Select Device</option>
                                     <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
                                         <?php foreach ($devices['data'] as $dev): ?>
@@ -101,30 +93,32 @@ if ($selected_device) {
 
                     <div class="card">
                         <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>PIN</th>
-                                        <th>Time</th>
-                                        <th>Status</th>
-                                        <th>Verify</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($attendance)): ?>
-                                        <?php foreach ($attendance as $log): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($log['pin']); ?></td>
-                                                <td><?php echo htmlspecialchars($log['scan']); ?></td>
-                                                <td><span class="badge bg-info"><?php echo htmlspecialchars($log['status_scan']); ?></span></td>
-                                                <td><?php echo htmlspecialchars($log['verify']); ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr><td colspan="4" class="text-center">No logs found for today.</td></tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>PIN</th>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                            <th>Verify</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (!empty($attendance)): ?>
+                                            <?php foreach ($attendance as $log): ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($log['pin']); ?></td>
+                                                    <td><?php echo htmlspecialchars($log['scan']); ?></td>
+                                                    <td><span class="badge bg-info"><?php echo htmlspecialchars($log['status_scan']); ?></span></td>
+                                                    <td><?php echo htmlspecialchars($log['verify']); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr><td colspan="4" class="text-center">No logs found for today.</td></tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -138,8 +132,8 @@ if ($selected_device) {
                                     <form method="POST">
                                         <input type="hidden" name="action" value="add_employee">
                                         <div class="mb-3">
-                                            <label class="form-label">Device</label>
-                                            <select name="cloud_id" class="form-select" required>
+                                            <label for="cloud_id" class="form-label">Device</label>
+                                            <select name="cloud_id" id="cloud_id" class="form-select" required>
                                                 <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
                                                     <?php foreach ($devices['data'] as $dev): ?>
                                                         <option value="<?php echo $dev['cloud_id']; ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
@@ -148,12 +142,12 @@ if ($selected_device) {
                                             </select>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">PIN</label>
-                                            <input type="text" name="pin" class="form-control" required>
+                                            <label for="pin" class="form-label">PIN</label>
+                                            <input type="text" name="pin" id="pin" class="form-control" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" name="name" class="form-control" required>
+                                            <label for="name" class="form-label">Full Name</label>
+                                            <input type="text" name="name" id="name" class="form-control" required>
                                         </div>
                                         <button type="submit" class="btn btn-success w-100">Send to Machine</button>
                                     </form>
@@ -170,7 +164,8 @@ if ($selected_device) {
                                     <form method="POST" class="row g-3">
                                         <input type="hidden" name="action" value="delete_employee">
                                         <div class="col-md-5">
-                                            <select name="cloud_id" class="form-select" required>
+                                            <label for="del_cloud_id" class="visually-hidden">Device</label>
+                                            <select name="cloud_id" id="del_cloud_id" class="form-select" required>
                                                 <option value="">Select Device</option>
                                                 <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
                                                     <?php foreach ($devices['data'] as $dev): ?>
@@ -180,7 +175,8 @@ if ($selected_device) {
                                             </select>
                                         </div>
                                         <div class="col-md-4">
-                                            <input type="text" name="pin" class="form-control" placeholder="PIN" required>
+                                            <label for="del_pin" class="visually-hidden">PIN</label>
+                                            <input type="text" name="pin" id="del_pin" class="form-control" placeholder="PIN" required>
                                         </div>
                                         <div class="col-md-3">
                                             <button type="submit" class="btn btn-danger w-100">Delete</button>
@@ -195,36 +191,38 @@ if ($selected_device) {
                     <h2>Device Status</h2>
                     <div class="card">
                         <div class="card-body">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Cloud ID</th>
-                                        <th>Name</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
-                                        <?php foreach ($devices['data'] as $dev): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($dev['cloud_id']); ?></td>
-                                                <td><?php echo htmlspecialchars($dev['name']); ?></td>
-                                                <td><span class="badge bg-success">Online</span></td>
-                                                <td>
-                                                    <form method="POST" style="display:inline;">
-                                                        <input type="hidden" name="action" value="sync_time">
-                                                        <input type="hidden" name="cloud_id" value="<?php echo $dev['cloud_id']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Sync Time</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr><td colspan="4" class="text-center">No devices found or API error.</td></tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cloud ID</th>
+                                            <th>Name</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
+                                            <?php foreach ($devices['data'] as $dev): ?>
+                                                <tr>
+                                                    <td><?php echo htmlspecialchars($dev['cloud_id']); ?></td>
+                                                    <td><?php echo htmlspecialchars($dev['name']); ?></td>
+                                                    <td><span class="badge bg-success">Online</span></td>
+                                                    <td>
+                                                        <form method="POST" style="display:inline;">
+                                                            <input type="hidden" name="action" value="sync_time">
+                                                            <input type="hidden" name="cloud_id" value="<?php echo $dev['cloud_id']; ?>">
+                                                            <button type="submit" class="btn btn-sm btn-outline-secondary">Sync Time</button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        <?php else: ?>
+                                            <tr><td colspan="4" class="text-center">No devices found or API error.</td></tr>
+                                        <?php endif; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 <?php endif; ?>

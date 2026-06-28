@@ -1,0 +1,37 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.sidebar {
+    height: 100vh;
+    background: #343a40;
+    color: white;
+    padding-top: 20px;
+}
+
+.sidebar a {
+    color: #adb5bd;
+    text-decoration: none;
+    display: block;
+    padding: 10px 20px;
+}
+
+.sidebar a:hover, .sidebar a.active {
+    color: white;
+    background: #495057;
+}
+
+.main-content {
+    padding: 20px;
+}
+
+.card {
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.table-responsive {
+    max-height: 500px;
+    overflow-y: auto;
+}
