@@ -23,9 +23,24 @@ Task 2/
 └── README.md             # Documentation
 ```
 
+## Main API Endpoints
+
+All requests to the Fingerspot Cloud API use the **POST** method and require a Bearer Token for authentication.
+
+| Endpoint | Description |
+| --- | --- |
+| `/api/get_device` | List all registered devices in the account. |
+| `/api/get_attlog` | Retrieve attendance scan logs within a specific date range. |
+| `/api/set_userinfo` | Add or update employee information (PIN, Name, Privilege) on a device. |
+| `/api/get_userinfo` | Request employee information from a device (Result returned via Webhook). |
+| `/api/delete_userinfo` | Remove an employee from a specific device. |
+| `/api/reg_online` | Activate remote registration mode for fingerprints, face, or cards. |
+| `/api/set_time` | Synchronize the device time or change the timezone. |
+| `/api/restart` | Reboot the attendance machine remotely. |
+
 ## Features Implemented
 
-The following main features and endpoints have been implemented:
+The following main features and endpoints have been implemented in this project:
 
 1.  **Authentication**: Bearer token implementation required for all requests.
 2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).

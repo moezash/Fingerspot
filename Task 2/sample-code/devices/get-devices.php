@@ -15,32 +15,40 @@ $apiUrl   = 'https://developer.fingerspot.io/api/get_device'; // Endpoint to get
 // 2. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
-// 3. Initialize cURL
+// 3. Prepare Request Body
+// A trans_id is recommended for tracking requests
+$data = [
+    'trans_id' => uniqid()
+];
+
+// 4. Initialize cURL
 $ch = curl_init($apiUrl);
 
-// 4. Set cURL Options
+// 5. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-// Using POST as per Fingerspot API convention for most endpoints
-curl_setopt($ch, CURLOPT_POST, true);
-// Even for listing, a trans_id is often recommended
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-    'trans_id' => '1'
-]));
 
-// 5. Execute Request
+// Setting CURLOPT_SSL_VERIFYPEER to true for production security.
+// Set to false only for local development troubleshooting.
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+// Using POST as per Fingerspot API convention
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+// 6. Execute Request
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-// 6. Check for errors
+// 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
-    // 7. Process Response
+    // 8. Process Response
     $result = json_decode($response, true);
 
     echo "--- Get Device List Sample ---\n";
@@ -48,11 +56,19 @@ if (curl_errno($ch)) {
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Devices found:\n";
-        foreach ($result['data'] as $device) {
-            echo "- SN: " . $device['cloud_id'] . " | Name: " . $device['name'] . "\n";
+        if (!empty($result['data'])) {
+            foreach ($result['data'] as $device) {
+                echo "- Cloud ID: " . $device['cloud_id'] . "\n";
+                echo "  Name    : " . $device['name'] . "\n";
+                echo "  Status  : " . ($device['status'] ?? 'N/A') . "\n";
+                echo "---------------------------\n";
+            }
+        } else {
+            echo "No devices found in this account.\n";
         }
     } else {
         echo "Failed to retrieve devices.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -65,9 +81,10 @@ POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1"
+    "trans_id": "65ab123456789"
 }
 
 Example Response (Success):

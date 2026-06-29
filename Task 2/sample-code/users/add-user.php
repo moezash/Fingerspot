@@ -15,22 +15,20 @@ $apiUrl   = 'https://developer.fingerspot.io/api/set_userinfo';
 
 // 2. Prepare User Data
 $data = [
-    'trans_id'  => '1',            // Unique ID for this request
+    'trans_id'  => uniqid(),       // Unique ID for this request
     'cloud_id'  => $cloudId,       // Device Cloud ID
     'pin'       => '101',          // Employee PIN / ID
     'name'      => 'John Doe',     // Employee Name
     'privilege' => '0',            // 0: User, 1: Admin
     'password'  => '',             // Device password (optional)
-    'rfid'      => '',             // RFID Card ID (optional)
-    // Templates can be sent here as well if you have the hex/base64 data
-    // 'finger_data' => '...',
-    // 'face_data'   => '...'
+    'rfid'      => ''              // RFID Card ID (optional)
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -39,9 +37,12 @@ $ch = curl_init($apiUrl);
 // 5. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+// Setting CURLOPT_SSL_VERIFYPEER to true for production security.
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 // 6. Execute Request
 $response = curl_exec($ch);
@@ -49,7 +50,7 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 // 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
     // 8. Process Response
     $result = json_decode($response, true);
@@ -60,9 +61,10 @@ if (curl_errno($ch)) {
 
     if ($result && isset($result['status']) && $result['status']) {
         echo "Command sent successfully to the machine.\n";
-        echo "Note: The machine will process this command and report the result via Webhook.\n";
+        echo "The user information has been queued for synchronization.\n";
     } else {
         echo "Failed to send command.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
         echo "Response: " . $response . "\n";
     }
 }
@@ -70,9 +72,15 @@ if (curl_errno($ch)) {
 curl_close($ch);
 
 /*
-Example Request Body:
+Example Request:
+POST /api/set_userinfo HTTP/1.1
+Host: developer.fingerspot.io
+Authorization: Bearer YOUR_API_TOKEN_HERE
+Content-Type: application/json
+Accept: application/json
+
 {
-    "trans_id": "1",
+    "trans_id": "65ab123456789",
     "cloud_id": "FTV123456",
     "pin": "101",
     "name": "John Doe",

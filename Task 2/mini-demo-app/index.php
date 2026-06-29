@@ -1,45 +1,53 @@
 <?php
+/**
+ * Main UI Controller for Fingerspot Mini Demo App
+ */
+
 require_once 'functions.php';
 
 $page = $_GET['page'] ?? 'dashboard';
-$message = '';
-$message_type = 'info';
+$action = $_POST['action'] ?? '';
 
-// Handle Actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        switch ($_POST['action']) {
-            case 'add_employee':
-                $res = add_employee($_POST['cloud_id'], $_POST['pin'], $_POST['name']);
-                $message = $res['message'] ?? ($res['status'] ? 'Employee added successfully' : 'Failed to add employee');
-                $message_type = $res['status'] ? 'success' : 'danger';
-                break;
-            case 'delete_employee':
-                $res = delete_employee($_POST['cloud_id'], $_POST['pin']);
-                $message = $res['message'] ?? ($res['status'] ? 'Employee delete command sent' : 'Failed to delete employee');
-                $message_type = $res['status'] ? 'success' : 'danger';
-                break;
-            case 'sync_time':
-                $res = sync_time($_POST['cloud_id']);
-                $message = $res['message'] ?? ($res['status'] ? 'Time sync command sent' : 'Failed to sync time');
-                $message_type = $res['status'] ? 'success' : 'danger';
-                break;
-        }
+// Handle actions
+if ($action) {
+    switch ($action) {
+        case 'add_employee':
+            $result = add_employee($_POST['cloud_id'], $_POST['pin'], $_POST['name'], $_POST['privilege']);
+            if ($result['status'] || (isset($result['success']) && $result['success'])) {
+                set_flash_message("Employee {$_POST['name']} successfully added to device.");
+            } else {
+                set_flash_message("Failed to add employee: " . ($result['message'] ?? 'Unknown error'), 'danger');
+            }
+            header("Location: index.php?page=employees");
+            exit;
+
+        case 'delete_employee':
+            $result = delete_employee($_POST['cloud_id'], $_POST['pin']);
+            if ($result['status'] || (isset($result['success']) && $result['success'])) {
+                set_flash_message("Delete command sent for PIN {$_POST['pin']}.");
+            } else {
+                set_flash_message("Failed to delete employee: " . ($result['message'] ?? 'Unknown error'), 'danger');
+            }
+            header("Location: index.php?page=employees");
+            exit;
+
+        case 'sync_time':
+            $result = sync_time($_POST['cloud_id']);
+            if ($result['status'] || (isset($result['success']) && $result['success'])) {
+                set_flash_message("Time synchronization command sent to device.");
+            } else {
+                set_flash_message("Failed to sync time: " . ($result['message'] ?? 'Unknown error'), 'danger');
+            }
+            header("Location: index.php?page=devices");
+            exit;
     }
 }
 
-// Fetch Data for Dashboard
-$devices = get_devices();
-$attendance = [];
-$selected_device = $_GET['device'] ?? '';
+// Prepare data for views
+$devices_response = get_devices();
+$devices = ((isset($devices_response['status']) && $devices_response['status']) || (isset($devices_response['success']) && $devices_response['success'])) ? ($devices_response['data'] ?? []) : [];
 
-if ($selected_device) {
-    $today = date('Y-m-d');
-    $att_res = get_attendance($selected_device, $today, $today);
-    if (isset($att_res['status']) && $att_res['status'] && isset($att_res['data'])) {
-        $attendance = $att_res['data'];
-    }
-}
+$flash = get_flash_message();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,190 +55,202 @@ if ($selected_device) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo APP_NAME; ?></title>
-    <!-- Simple CSS for the dashboard -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <style>
-        body { background-color: #f8f9fa; }
-        .sidebar { height: 100vh; background: #343a40; color: white; padding-top: 20px; }
-        .sidebar a { color: #adb5bd; text-decoration: none; display: block; padding: 10px 20px; }
-        .sidebar a:hover, .sidebar a.active { color: white; background: #495057; }
-        .main-content { padding: 20px; }
-        .card { margin-bottom: 20px; border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-2 sidebar">
-                <h4 class="text-center mb-4">Fingerspot App</h4>
-                <a href="index.php?page=dashboard" class="<?php echo $page == 'dashboard' ? 'active' : ''; ?>">Dashboard</a>
-                <a href="index.php?page=employees" class="<?php echo $page == 'employees' ? 'active' : ''; ?>">Employees</a>
-                <a href="index.php?page=devices" class="<?php echo $page == 'devices' ? 'active' : ''; ?>">Devices</a>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-2 d-none d-md-block sidebar">
+            <div class="position-sticky">
+                <h4 class="text-center mb-4">Fingerspot Fio</h4>
+                <a href="index.php?page=dashboard" class="<?php echo $page === 'dashboard' ? 'active' : ''; ?>">Dashboard</a>
+                <a href="index.php?page=employees" class="<?php echo $page === 'employees' ? 'active' : ''; ?>">Employees</a>
+                <a href="index.php?page=devices" class="<?php echo $page === 'devices' ? 'active' : ''; ?>">Devices</a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-10 ms-sm-auto px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Attendance Monitoring</h1>
             </div>
 
-            <!-- Main Content -->
-            <div class="col-md-10 main-content">
-                <?php if ($message): ?>
-                    <div class="alert alert-<?php echo $message_type; ?> alert-dismissible fade show" role="alert">
-                        <?php echo htmlspecialchars($message); ?>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                <?php endif; ?>
+            <?php if ($flash): ?>
+                <div class="alert alert-<?php echo htmlspecialchars($flash['type']); ?> alert-dismissible fade show" role="alert">
+                    <?php echo htmlspecialchars($flash['message']); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
 
-                <?php if ($page == 'dashboard'): ?>
-                    <h2>Attendance Dashboard (Today)</h2>
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <form method="GET" class="d-flex">
-                                <input type="hidden" name="page" value="dashboard">
-                                <select name="device" class="form-select me-2">
-                                    <option value="">Select Device</option>
-                                    <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
-                                        <?php foreach ($devices['data'] as $dev): ?>
-                                            <option value="<?php echo $dev['cloud_id']; ?>" <?php echo $selected_device == $dev['cloud_id'] ? 'selected' : ''; ?>>
-                                                <?php echo htmlspecialchars($dev['name']); ?> (<?php echo $dev['cloud_id']; ?>)
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                                <button type="submit" class="btn btn-primary">Filter</button>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>PIN</th>
-                                        <th>Time</th>
-                                        <th>Status</th>
-                                        <th>Verify</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (!empty($attendance)): ?>
-                                        <?php foreach ($attendance as $log): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($log['pin']); ?></td>
-                                                <td><?php echo htmlspecialchars($log['scan']); ?></td>
-                                                <td><span class="badge bg-info"><?php echo htmlspecialchars($log['status_scan']); ?></span></td>
-                                                <td><?php echo htmlspecialchars($log['verify']); ?></td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr><td colspan="4" class="text-center">No logs found for today.</td></tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                <?php elseif ($page == 'employees'): ?>
-                    <h2>Employee Management</h2>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="card">
-                                <div class="card-header">Add New Employee</div>
-                                <div class="card-body">
-                                    <form method="POST">
-                                        <input type="hidden" name="action" value="add_employee">
-                                        <div class="mb-3">
-                                            <label class="form-label">Device</label>
-                                            <select name="cloud_id" class="form-select" required>
-                                                <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
-                                                    <?php foreach ($devices['data'] as $dev): ?>
-                                                        <option value="<?php echo $dev['cloud_id']; ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">PIN</label>
-                                            <input type="text" name="pin" class="form-control" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Full Name</label>
-                                            <input type="text" name="name" class="form-control" required>
-                                        </div>
-                                        <button type="submit" class="btn btn-success w-100">Send to Machine</button>
-                                    </form>
-                                </div>
+            <?php if ($page === 'dashboard'): ?>
+                <h2>Attendance Dashboard</h2>
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <span>Recent Attendance Logs</span>
+                                <form class="row g-2" method="GET">
+                                    <input type="hidden" name="page" value="dashboard">
+                                    <div class="col-auto">
+                                        <select name="cloud_id" class="form-select form-select-sm" required>
+                                            <option value="">Select Device</option>
+                                            <?php foreach ($devices as $dev): ?>
+                                                <option value="<?php echo htmlspecialchars($dev['cloud_id']); ?>" <?php echo ($_GET['cloud_id'] ?? '') === $dev['cloud_id'] ? 'selected' : ''; ?>>
+                                                    <?php echo htmlspecialchars($dev['name']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                                    </div>
+                                </form>
                             </div>
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card">
-                                <div class="card-header">Actions</div>
-                                <div class="card-body">
-                                    <p>Use the form on the left to add employees to the machine.</p>
-                                    <hr>
-                                    <h5>Delete Employee</h5>
-                                    <form method="POST" class="row g-3">
-                                        <input type="hidden" name="action" value="delete_employee">
-                                        <div class="col-md-5">
-                                            <select name="cloud_id" class="form-select" required>
-                                                <option value="">Select Device</option>
-                                                <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
-                                                    <?php foreach ($devices['data'] as $dev): ?>
-                                                        <option value="<?php echo $dev['cloud_id']; ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="text" name="pin" class="form-control" placeholder="PIN" required>
-                                        </div>
-                                        <div class="col-md-3">
-                                            <button type="submit" class="btn btn-danger w-100">Delete</button>
-                                        </div>
-                                    </form>
-                                </div>
+                            <div class="card-body">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>PIN</th>
+                                            <th>Scan Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        if (isset($_GET['cloud_id'])) {
+                                            $today = date('Y-m-d');
+                                            $logs_response = get_attendance($_GET['cloud_id'], $today, $today);
+                                            $logs = ((isset($logs_response['status']) && $logs_response['status']) || (isset($logs_response['success']) && $logs_response['success'])) ? ($logs_response['data'] ?? []) : [];
+
+                                            if (!empty($logs)) {
+                                                foreach ($logs as $log) {
+                                                    echo "<tr>
+                                                        <td>" . htmlspecialchars($log['pin']) . "</td>
+                                                        <td>" . htmlspecialchars($log['scan']) . "</td>
+                                                        <td><span class='badge bg-info'>" . htmlspecialchars($log['status_scan']) . "</span></td>
+                                                    </tr>";
+                                                }
+                                            } else {
+                                                echo "<tr><td colspan='3' class='text-center'>No logs found for today or device offline.</td></tr>";
+                                            }
+                                        } else {
+                                            echo "<tr><td colspan='3' class='text-center'>Please select a device to view logs.</td></tr>";
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                <?php elseif ($page == 'devices'): ?>
-                    <h2>Device Status</h2>
-                    <div class="card">
-                        <div class="card-body">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Cloud ID</th>
-                                        <th>Name</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php if (isset($devices['status']) && $devices['status'] && isset($devices['data'])): ?>
-                                        <?php foreach ($devices['data'] as $dev): ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($dev['cloud_id']); ?></td>
-                                                <td><?php echo htmlspecialchars($dev['name']); ?></td>
-                                                <td><span class="badge bg-success">Online</span></td>
-                                                <td>
-                                                    <form method="POST" style="display:inline;">
-                                                        <input type="hidden" name="action" value="sync_time">
-                                                        <input type="hidden" name="cloud_id" value="<?php echo $dev['cloud_id']; ?>">
-                                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Sync Time</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    <?php else: ?>
-                                        <tr><td colspan="4" class="text-center">No devices found or API error.</td></tr>
-                                    <?php endif; ?>
-                                </tbody>
-                            </table>
+            <?php elseif ($page === 'employees'): ?>
+                <h2>Employee Management</h2>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">Add New Employee</div>
+                            <div class="card-body">
+                                <form method="POST">
+                                    <input type="hidden" name="action" value="add_employee">
+                                    <div class="mb-3">
+                                        <label for="cloud_id" class="form-label">Target Device</label>
+                                        <select name="cloud_id" id="cloud_id" class="form-select" required>
+                                            <option value="">Select Device</option>
+                                            <?php foreach ($devices as $dev): ?>
+                                                <option value="<?php echo htmlspecialchars($dev['cloud_id']); ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="pin" class="form-label">PIN (ID)</label>
+                                        <input type="text" name="pin" id="pin" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Full Name</label>
+                                        <input type="text" name="name" id="name" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="privilege" class="form-label">Privilege</label>
+                                        <select name="privilege" id="privilege" class="form-select">
+                                            <option value="0">User</option>
+                                            <option value="1">Admin</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary w-100">Upload to Device</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                <?php endif; ?>
-            </div>
-        </div>
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">Existing Employees (Device Commands)</div>
+                            <div class="card-body text-center py-5">
+                                <p class="text-muted">Employee lists are maintained on the devices. Use the form to add or update.</p>
+                                <hr>
+                                <h5>Remote Delete</h5>
+                                <form method="POST" class="row g-3 justify-content-center">
+                                    <input type="hidden" name="action" value="delete_employee">
+                                    <div class="col-auto">
+                                        <select name="cloud_id" class="form-select" required>
+                                            <option value="">Device</option>
+                                            <?php foreach ($devices as $dev): ?>
+                                                <option value="<?php echo htmlspecialchars($dev['cloud_id']); ?>"><?php echo htmlspecialchars($dev['name']); ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto">
+                                        <input type="text" name="pin" class="form-control" placeholder="PIN to delete" required>
+                                    </div>
+                                    <div class="col-auto">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete from Device</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <?php elseif ($page === 'devices'): ?>
+                <h2>Device List</h2>
+                <div class="row mt-4">
+                    <?php if (empty($devices)): ?>
+                        <div class="col-12">
+                            <div class="alert alert-warning">No devices found. Please check your API Token and Cloud ID in the dashboard.</div>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($devices as $dev): ?>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title"><?php echo htmlspecialchars($dev['name']); ?></h5>
+                                        <p class="card-text text-muted"><?php echo htmlspecialchars($dev['cloud_id']); ?></p>
+                                        <p class="<?php echo (isset($dev['status']) && $dev['status'] === 'Online') ? 'status-online' : 'status-offline'; ?>">
+                                            ● <?php echo htmlspecialchars($dev['status'] ?? 'Unknown'); ?>
+                                        </p>
+                                        <div class="mt-3">
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="action" value="sync_time">
+                                                <input type="hidden" name="cloud_id" value="<?php echo htmlspecialchars($dev['cloud_id']); ?>">
+                                                <button type="submit" class="btn btn-outline-secondary btn-sm">Sync Time</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+
+        </main>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+<?php ?>

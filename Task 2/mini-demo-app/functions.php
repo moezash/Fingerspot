@@ -1,36 +1,39 @@
 <?php
 /**
- * Utility functions for Fingerspot Mini Demo App
+ * Helper functions for Fingerspot Mini Demo App
  */
+
 require_once 'config.php';
 
 /**
- * Send a POST request to the Fingerspot API
+ * Generic function to make a POST request to Fingerspot API
  *
  * @param string $endpoint The API endpoint (e.g., 'get_device')
- * @param array $data The data to send in the request body
+ * @param array $data The payload data
  * @return array The decoded JSON response
  */
 function fingerspot_request($endpoint, $data = []) {
-    $url = API_URL . '/' . $endpoint;
+    $apiUrl = API_URL . '/' . $endpoint;
 
-    // Ensure trans_id is present
+    // Ensure trans_id exists
     if (!isset($data['trans_id'])) {
-        $data['trans_id'] = (string)time();
+        $data['trans_id'] = uniqid();
     }
 
     $headers = [
         'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
-    $ch = curl_init($url);
+    $ch = curl_init($apiUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+    // Setting CURLOPT_SSL_VERIFYPEER to true for production security.
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     $response = curl_exec($ch);
     $error = curl_error($ch);
@@ -40,23 +43,23 @@ function fingerspot_request($endpoint, $data = []) {
         return ['status' => false, 'message' => "cURL Error: $error"];
     }
 
-    $decoded = json_decode($response, true);
-    if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
+    $result = json_decode($response, true);
+    if ($result === null) {
+        return ['status' => false, 'message' => "Invalid response from server"];
     }
 
-    return $decoded;
+    return $result;
 }
 
 /**
- * Get the list of devices
+ * Get all devices
  */
 function get_devices() {
     return fingerspot_request('get_device');
 }
 
 /**
- * Get attendance logs for a device
+ * Get attendance logs
  */
 function get_attendance($cloud_id, $start_date, $end_date) {
     return fingerspot_request('get_attlog', [
@@ -67,19 +70,19 @@ function get_attendance($cloud_id, $start_date, $end_date) {
 }
 
 /**
- * Add a new employee to a device
+ * Add an employee
  */
-function add_employee($cloud_id, $pin, $name) {
+function add_employee($cloud_id, $pin, $name, $privilege = 0) {
     return fingerspot_request('set_userinfo', [
         'cloud_id' => $cloud_id,
         'pin' => $pin,
         'name' => $name,
-        'privilege' => '0'
+        'privilege' => $privilege
     ]);
 }
 
 /**
- * Delete an employee from a device
+ * Delete an employee
  */
 function delete_employee($cloud_id, $pin) {
     return fingerspot_request('delete_userinfo', [
@@ -95,5 +98,27 @@ function sync_time($cloud_id) {
     return fingerspot_request('set_time', [
         'cloud_id' => $cloud_id
     ]);
+}
+
+/**
+ * Helper to set flash message
+ */
+function set_flash_message($message, $type = 'success') {
+    $_SESSION['flash'] = [
+        'message' => $message,
+        'type' => $type
+    ];
+}
+
+/**
+ * Helper to get and clear flash message
+ */
+function get_flash_message() {
+    if (isset($_SESSION['flash'])) {
+        $flash = $_SESSION['flash'];
+        unset($_SESSION['flash']);
+        return $flash;
+    }
+    return null;
 }
 ?>
