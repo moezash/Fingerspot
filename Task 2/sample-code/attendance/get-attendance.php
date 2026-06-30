@@ -1,9 +1,9 @@
 <?php
 /**
- * Sample code for Get Attendance Logs from Fingerspot API
+ * Sample code for Get Attendance Logs from Fingerspot Cloud API
  *
  * This sample demonstrates how to retrieve attendance logs (scan data)
- * from a specific device within a date range.
+ * from a specific device within a specified date range.
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -14,17 +14,28 @@ $cloudId  = 'YOUR_CLOUD_ID_HERE'; // The ID of your attendance machine
 $apiUrl   = 'https://developer.fingerspot.io/api/get_attlog';
 
 // 2. Prepare Data
+/**
+ * Parameters for getting attendance logs:
+ * - trans_id: Unique transaction ID
+ * - cloud_id: The SN/Cloud ID of the device
+ * - start_date: Start date (YYYY-MM-DD)
+ * - end_date: End date (YYYY-MM-DD)
+ *
+ * Note: Fingerspot documentation typically recommends a maximum range
+ * of 2 days per request for performance.
+ */
 $data = [
-    'trans_id'   => '1',                // Unique ID for this request
-    'cloud_id'   => $cloudId,           // Device Cloud ID
-    'start_date' => date('Y-m-d'),      // Start date (YYYY-MM-DD)
-    'end_date'   => date('Y-m-d')       // End date (YYYY-MM-DD)
+    'trans_id'   => uniqid(),
+    'cloud_id'   => $cloudId,
+    'start_date' => date('Y-m-d'),      // Today's date
+    'end_date'   => date('Y-m-d')       // Today's date
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -35,7 +46,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+/**
+ * SECURITY NOTE:
+ * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 // 6. Execute Request
 $response = curl_exec($ch);
@@ -53,11 +69,21 @@ if (curl_errno($ch)) {
     echo "Date Range: " . $data['start_date'] . " to " . $data['end_date'] . "\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
+    if ($result && (isset($result['status']) && $result['status'] === true)) {
         echo "Logs retrieved successfully:\n";
-        if (isset($result['data']) && !empty($result['data'])) {
+
+        if (isset($result['data']) && is_array($result['data']) && !empty($result['data'])) {
+            // Table Header
+            printf("%-10s | %-20s | %-10s\n", "PIN", "Scan Time", "Verify");
+            echo str_repeat("-", 48) . "\n";
+
             foreach ($result['data'] as $log) {
-                echo "- PIN: " . $log['pin'] . " | Time: " . $log['scan'] . " | Status: " . $log['status_scan'] . "\n";
+                printf(
+                    "%-10s | %-20s | %-10s\n",
+                    $log['pin'] ?? 'N/A',
+                    $log['scan'] ?? 'N/A',
+                    $log['verify'] ?? 'N/A'
+                );
             }
         } else {
             echo "No logs found for the selected period.\n";
@@ -77,12 +103,13 @@ POST /api/get_attlog HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1",
-    "cloud_id": "FTV123456",
-    "start_date": "2024-01-01",
-    "end_date": "2024-01-07"
+    "trans_id": "65b2a2a0e5f1a",
+    "cloud_id": "FTV123456789",
+    "start_date": "2024-02-01",
+    "end_date": "2024-02-01"
 }
 
 Example Response (Success):
@@ -92,15 +119,15 @@ Example Response (Success):
     "data": [
         {
             "pin": "1",
-            "scan": "2024-01-01 08:00:15",
+            "scan": "2024-02-01 08:00:15",
             "verify": "1",
             "status_scan": "0"
         },
         {
-            "pin": "1",
-            "scan": "2024-01-01 17:05:30",
+            "pin": "2",
+            "scan": "2024-02-01 08:05:30",
             "verify": "1",
-            "status_scan": "1"
+            "status_scan": "0"
         }
     ]
 }
@@ -108,7 +135,7 @@ Example Response (Success):
 Example Response (Error):
 {
     "status": false,
-    "message": "Invalid Cloud ID"
+    "message": "Invalid Cloud ID or Device Offline"
 }
 */
 ?>
