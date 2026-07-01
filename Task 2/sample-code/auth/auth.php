@@ -16,7 +16,8 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
@@ -28,7 +29,12 @@ function testAuthentication($url, $headers) {
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+    /**
+     * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+     * Setting it to false is strictly for local development troubleshooting ONLY
+     * when encountering SSL certificate verification issues.
+     */
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     // Execute request
     $response = curl_exec($ch);
@@ -52,22 +58,35 @@ foreach ($headers as $header) {
 echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
 
 /*
-Example Request Headers:
-GET /api/get_device HTTP/1.1
+Example Request:
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
-Example Response (if token is invalid):
 {
-    "status": false,
-    "message": "Unauthorized"
+    "trans_id": "65a1234567890"
 }
 
-Example Response (if token is valid):
+Example Response (Success):
 {
     "status": true,
-    "data": [...]
+    "message": "Success",
+    "data": [
+        {
+            "cloud_id": "FTV123456",
+            "name": "Front Office",
+            "status": "Online"
+        }
+    ]
+}
+
+Example Response (Unauthorized):
+{
+    "status": false,
+    "error_code": "401",
+    "message": "Unauthorized: Invalid or expired token"
 }
 */
 ?>

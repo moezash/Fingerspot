@@ -23,19 +23,29 @@ Task 2/
 └── README.md             # Documentation
 ```
 
+## API Endpoints
+
+The following main endpoints have been identified and implemented from the [Fingerspot Developer Documentation](https://developer.fingerspot.io):
+
+| Feature | Endpoint | Method | Description |
+| --- | --- | --- | --- |
+| **Get Device List** | `/api/get_device` | POST | Retrieve all registered attendance machines in the account. |
+| **Get Attendance Logs** | `/api/get_attlog` | POST | Fetch attendance scan data with date range filtering. |
+| **Get User Info** | `/api/get_userinfo` | POST | Request user information (PIN, name, templates) from a device. |
+| **Set User Info** | `/api/set_userinfo` | POST | Upload or update user information on a specific device. |
+| **Delete User Info** | `/api/delete_userinfo` | POST | Remote command to delete user data from a device. |
+| **Remote Registration**| `/api/reg_online` | POST | Trigger a device to enter remote registration mode. |
+| **Sync Time** | `/api/set_time` | POST | Synchronize the date, time, and timezone of a device. |
+| **Restart Machine** | `/api/restart` | POST | Remotely reboot the attendance machine. |
+
 ## Features Implemented
 
-The following main features and endpoints have been implemented:
-
 1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+2.  **Device Management**: Listing devices and monitoring status.
+3.  **Attendance Tracking**: Retrieving historical scan logs.
+4.  **Employee Management**: CRUD operations for users on devices (Add, Request, Delete).
+5.  **Device Control**: Remote commands for synchronization and maintenance.
+6.  **Webhook Integration**: Processing real-time data push for logs and async responses.
 
 ## Requirements
 
