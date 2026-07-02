@@ -23,19 +23,29 @@ Task 2/
 └── README.md             # Documentation
 ```
 
-## Features Implemented
+## Main Endpoints Documentation
 
-The following main features and endpoints have been implemented:
+Based on [developer.fingerspot.io](https://developer.fingerspot.io), the following are the core API endpoints for Fingerspot Cloud:
 
-1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+| Feature | Endpoint | Method | Description |
+|---------|----------|--------|-------------|
+| **Device List** | `/api/get_device` | POST | Retrieve a list of all attendance devices registered to your account. |
+| **Attendance Logs** | `/api/get_attlog` | POST | Retrieve attendance scan logs from a specific device within a date range. |
+| **Set User Info** | `/api/set_userinfo` | POST | Add or update employee information (PIN, Name, Privilege, etc.) on a device. |
+| **Get User Info** | `/api/get_userinfo` | POST | Request employee information from a device (result returned via Webhook). |
+| **Delete User Info** | `/api/delete_userinfo` | POST | Remove an employee from a specific attendance device. |
+| **Register Online** | `/api/reg_online` | POST | Trigger remote registration mode for fingerprints, face, etc. |
+| **Set Time** | `/api/set_time` | POST | Synchronize the device's date, time, and timezone. |
+| **Restart Device** | `/api/restart` | POST | Remote reboot of the attendance machine. |
+
+## Features Implemented in this Project
+
+1.  **Authentication**: Secure Bearer token implementation for all API requests.
+2.  **Get Device List**: Full implementation of device retrieval.
+3.  **Get Attendance Logs**: Flexible retrieval of scan data with date filtering.
+4.  **Employee Management**: Add, update, and delete employees remotely.
+5.  **Remote Operations**: Syncing time and restarting machines from the cloud.
+6.  **Webhook Integration**: Sample logic for receiving real-time push data.
 
 ## Requirements
 

@@ -1,19 +1,19 @@
 <?php
 /**
- * Configuration file for Fingerspot Mini Demo App
+ * Configuration for the Attendance Monitoring Dashboard
  */
 
-// API Credentials
-// Replace with your actual Fingerspot API Token
-define('API_TOKEN', 'YOUR_API_TOKEN_HERE');
+// API Credentials - Replace with your actual credentials
+define('FINGERSPOT_API_TOKEN', 'YOUR_API_TOKEN_HERE');
+define('FINGERSPOT_CLOUD_ID', 'YOUR_CLOUD_ID_HERE');
 
-// Base API URL
-define('API_URL', 'https://developer.fingerspot.io/api');
+// API Base URL
+define('FINGERSPOT_API_BASE', 'https://developer.fingerspot.io/api');
 
-// App Settings
-define('APP_NAME', 'Attendance Monitor');
+// Dashboard Settings
+define('APP_NAME', 'Fingerspot Attendance Dashboard');
+define('APP_VERSION', '1.0.0');
 
-// Error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Reporting settings (default range for logs)
+define('DEFAULT_DATE_RANGE', 0); // 0 means today only
 ?>
