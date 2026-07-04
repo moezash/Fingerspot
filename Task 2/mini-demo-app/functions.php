@@ -1,27 +1,29 @@
 <?php
 /**
- * Utility functions for Fingerspot Mini Demo App
+ * Mini Demo App: Helper Functions
  */
+
 require_once 'config.php';
 
 /**
- * Send a POST request to the Fingerspot API
+ * Sends a POST request to the Fingerspot API.
  *
  * @param string $endpoint The API endpoint (e.g., 'get_device')
- * @param array $data The data to send in the request body
- * @return array The decoded JSON response
+ * @param array $data The payload data
+ * @return array|null The decoded JSON response or null on failure
  */
 function fingerspot_request($endpoint, $data = []) {
-    $url = API_URL . '/' . $endpoint;
+    $url = FINGERSPOT_API_URL . '/' . $endpoint;
 
-    // Ensure trans_id is present
+    // Ensure trans_id is always present
     if (!isset($data['trans_id'])) {
-        $data['trans_id'] = (string)time();
+        $data['trans_id'] = uniqid($endpoint . '_');
     }
 
     $headers = [
-        'Authorization: Bearer ' . API_TOKEN,
-        'Content-Type: application/json'
+        'Authorization: Bearer ' . FINGERSPOT_API_TOKEN,
+        'Content-Type: application/json',
+        'Accept: application/json'
     ];
 
     $ch = curl_init($url);
@@ -29,71 +31,39 @@ function fingerspot_request($endpoint, $data = []) {
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     $response = curl_exec($ch);
-    $error = curl_error($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    if (curl_errno($ch)) {
+        return ['status' => false, 'message' => 'cURL Error: ' . curl_error($ch)];
+    }
+
     curl_close($ch);
 
-    if ($error) {
-        return ['status' => false, 'message' => "cURL Error: $error"];
+    $result = json_decode($response, true);
+
+    // If decoding failed
+    if ($result === null) {
+        return ['status' => false, 'message' => 'Invalid JSON response'];
     }
 
-    $decoded = json_decode($response, true);
-    if ($decoded === null) {
-        return ['status' => false, 'message' => "Invalid JSON response: $response"];
-    }
-
-    return $decoded;
+    return $result;
 }
 
 /**
- * Get the list of devices
+ * Checks if the API response indicates success.
+ * Handles both 'status' and 'success' keys used by Fingerspot API.
  */
-function get_devices() {
-    return fingerspot_request('get_device');
+function is_success($result) {
+    return (isset($result['status']) && $result['status']) || (isset($result['success']) && $result['success']);
 }
 
 /**
- * Get attendance logs for a device
+ * Sanitizes output for HTML display.
  */
-function get_attendance($cloud_id, $start_date, $end_date) {
-    return fingerspot_request('get_attlog', [
-        'cloud_id' => $cloud_id,
-        'start_date' => $start_date,
-        'end_date' => $end_date
-    ]);
-}
-
-/**
- * Add a new employee to a device
- */
-function add_employee($cloud_id, $pin, $name) {
-    return fingerspot_request('set_userinfo', [
-        'cloud_id' => $cloud_id,
-        'pin' => $pin,
-        'name' => $name,
-        'privilege' => '0'
-    ]);
-}
-
-/**
- * Delete an employee from a device
- */
-function delete_employee($cloud_id, $pin) {
-    return fingerspot_request('delete_userinfo', [
-        'cloud_id' => $cloud_id,
-        'pin' => $pin
-    ]);
-}
-
-/**
- * Sync device time
- */
-function sync_time($cloud_id) {
-    return fingerspot_request('set_time', [
-        'cloud_id' => $cloud_id
-    ]);
+function e($string) {
+    return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
 }
 ?>

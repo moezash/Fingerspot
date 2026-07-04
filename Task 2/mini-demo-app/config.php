@@ -1,19 +1,16 @@
 <?php
 /**
- * Configuration file for Fingerspot Mini Demo App
+ * Mini Demo App: Configuration
  */
 
-// API Credentials
-// Replace with your actual Fingerspot API Token
-define('API_TOKEN', 'YOUR_API_TOKEN_HERE');
+// Replace with your actual Fingerspot API credentials
+define('FINGERSPOT_API_TOKEN', 'YOUR_API_TOKEN_HERE');
 
-// Base API URL
-define('API_URL', 'https://developer.fingerspot.io/api');
+// Base URL for Fingerspot Cloud API
+define('FINGERSPOT_API_URL', 'https://developer.fingerspot.io/api');
 
-// App Settings
-define('APP_NAME', 'Attendance Monitor');
-
-// Error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+/**
+ * Common configuration for the mini demo app
+ */
+date_default_timezone_set('Asia/Jakarta');
 ?>

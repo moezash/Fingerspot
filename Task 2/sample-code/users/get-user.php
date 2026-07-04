@@ -1,9 +1,17 @@
 <?php
 /**
- * Sample code for Getting User Information from Fingerspot Device
+ * Fingerspot API Sample Code: Get User Information
  *
- * This sample demonstrates how to request user data (names, templates, etc.)
- * from the attendance machine.
+ * This sample demonstrates how to request detailed user information
+ * (including templates) from the attendance machine.
+ *
+ * IMPORTANT: This is an asynchronous request. The machine will receive
+ * the command and then push the user data back to your configured
+ * Webhook URL.
+ *
+ * Requirements:
+ * - api_token: Obtain from Fingerspot Developer Dashboard
+ * - cloud_id: The unique ID of your registered device
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -13,55 +21,87 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 $cloudId  = 'YOUR_CLOUD_ID_HERE';
 $apiUrl   = 'https://developer.fingerspot.io/api/get_userinfo';
 
-// 2. Prepare Data
+// 2. Prepare Request Data
 $data = [
-    'trans_id' => '1',
-    'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN to retrieve. Leave empty or omit if supported to get all.
+    'trans_id' => uniqid('getuser_'), // Unique transaction identifier
+    'cloud_id' => $cloudId,           // Device Identifier
+    'pin'      => '101'               // PIN of the user to retrieve
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
-// 4. Initialize cURL
+// 4. Initialize and Configure cURL
 $ch = curl_init($apiUrl);
 
-// 5. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-// 6. Execute Request
+/**
+ * SECURITY NOTE:
+ * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+// 5. Execute Request
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// 6. Check for cURL Errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo "cURL Error: " . curl_error($ch) . "\n";
 } else {
+    // 7. Parse and Process Response
     $result = json_decode($response, true);
 
-    echo "--- Get User Information Sample ---\n";
-    echo "Requesting data for PIN: " . $data['pin'] . "\n";
+    echo "--- Fingerspot API: Get User Information Sample ---\n";
+    echo "Requesting user data for PIN: " . htmlspecialchars($data['pin']) . "\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
-        echo "Request successful. The machine will send the user data to your Webhook URL.\n";
+    $success = (isset($result['status']) && $result['status']) || (isset($result['success']) && $result['success']);
+
+    if ($success) {
+        echo "Command sent successfully to the machine.\n";
+        echo "Check your Webhook logs for the actual user data response.\n";
     } else {
-        echo "Failed to request data.\n";
-        echo "Response: " . $response . "\n";
+        echo "Failed to send command.\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
 
 /*
-Note: Fingerspot API often works asynchronously for "Get Userinfo".
-The API call initiates the request, and the machine pushes the actual
-user data back to your server via the configured Webhook.
+Example Request Body:
+{
+    "trans_id": "getuser_65f1234567890",
+    "cloud_id": "FTV12345678",
+    "pin": "101"
+}
+
+Example Response (Success):
+{
+    "status": true,
+    "message": "Success"
+}
+
+Example Webhook Data (sent later by the machine):
+{
+    "cloud_id": "FTV12345678",
+    "trans_id": "getuser_65f1234567890",
+    "pin": "101",
+    "name": "John Doe",
+    "privilege": "0",
+    "finger_data": "...",
+    "face_data": "...",
+    "type": "get_userinfo"
+}
 */
 ?>

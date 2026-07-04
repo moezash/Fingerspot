@@ -1,8 +1,13 @@
 <?php
 /**
- * Sample code for Deleting User Information from Fingerspot Device
+ * Fingerspot API Sample Code: Delete User Information
  *
- * This sample demonstrates how to delete an employee from the machine.
+ * This sample demonstrates how to remotely remove an employee/user
+ * from the attendance machine.
+ *
+ * Requirements:
+ * - api_token: Obtain from Fingerspot Developer Dashboard
+ * - cloud_id: The unique ID of your registered device
  *
  * Documentation: https://developer.fingerspot.io
  */
@@ -12,47 +17,75 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 $cloudId  = 'YOUR_CLOUD_ID_HERE';
 $apiUrl   = 'https://developer.fingerspot.io/api/delete_userinfo';
 
-// 2. Prepare Data
+// 2. Prepare Request Data
 $data = [
-    'trans_id' => '1',
-    'cloud_id' => $cloudId,
-    'pin'      => '101' // PIN of the employee to delete
+    'trans_id' => uniqid('deluser_'), // Unique transaction identifier
+    'cloud_id' => $cloudId,           // Device Identifier
+    'pin'      => '101'               // The PIN of the employee to delete
 ];
 
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
-// 4. Initialize cURL
+// 4. Initialize and Configure cURL
 $ch = curl_init($apiUrl);
 
-// 5. Set cURL Options
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-// 6. Execute Request
+/**
+ * SECURITY NOTE:
+ * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+// 5. Execute Request
 $response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+// 6. Check for cURL Errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo "cURL Error: " . curl_error($ch) . "\n";
 } else {
+    // 7. Parse and Process Response
     $result = json_decode($response, true);
 
-    echo "--- Delete User Sample ---\n";
-    echo "Deleting PIN: " . $data['pin'] . "\n";
+    echo "--- Fingerspot API: Delete User Information Sample ---\n";
+    echo "Requesting deletion for PIN: " . htmlspecialchars($data['pin']) . "\n";
+    echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
-        echo "Delete command sent successfully.\n";
+    $success = (isset($result['status']) && $result['status']) || (isset($result['success']) && $result['success']);
+
+    if ($success) {
+        echo "Delete command sent successfully to the machine.\n";
+        echo "Note: The actual deletion result will be reported via Webhook.\n";
     } else {
         echo "Failed to send delete command.\n";
-        echo "Response: " . $response . "\n";
+        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
+        echo "Full Response: " . $response . "\n";
     }
 }
 
 curl_close($ch);
+
+/*
+Example Request Body:
+{
+    "trans_id": "deluser_65f1234567890",
+    "cloud_id": "FTV12345678",
+    "pin": "101"
+}
+
+Example Response (Success):
+{
+    "status": true,
+    "message": "Success"
+}
+*/
 ?>
