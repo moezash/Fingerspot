@@ -23,19 +23,29 @@ Task 2/
 └── README.md             # Documentation
 ```
 
-## Features Implemented
+## Main Endpoints & Features
 
-The following main features and endpoints have been implemented:
+Based on the official [Fingerspot Documentation](https://developer.fingerspot.io), the following endpoints are available and implemented in this project:
 
-1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+| Category | Endpoint | Method | Description |
+| :--- | :--- | :--- | :--- |
+| **Authentication** | - | - | All requests require a `Bearer [token]` in the Authorization header. |
+| **Device** | `/api/get_device` | POST | Retrieve the list of registered devices and their status. |
+| **Attendance** | `/api/get_attlog` | POST | Retrieve attendance logs (scan data) within a date range (max 2 days). |
+| **User** | `/api/get_userinfo` | POST | Request detailed user information (Asynchronous). |
+| **User** | `/api/set_userinfo` | POST | Add or update user information on a device (Asynchronous). |
+| **User** | `/api/delete_userinfo`| POST | Delete a user from a device (Asynchronous). |
+| **User** | `/api/reg_online` | POST | Trigger remote biometric registration (Asynchronous). |
+| **User** | `/api/get_userid_list`| POST | Retrieve all registered PINs on a device (Asynchronous). |
+| **System** | `/api/set_time` | POST | Synchronize device time and timezone (Asynchronous). |
+| **System** | `/api/restart` | POST | Remotely reboot the device (Asynchronous). |
+| **Webhook** | - | POST | Receives real-time attendance logs and asynchronous command responses. |
+
+## Features Implemented in Mini Demo App
+- Dashboard with Device Status
+- Real-time Attendance Monitoring
+- Employee Management (View, Add, Delete)
+- Device Synchronization (Time Sync, Restart)
 
 ## Requirements
 
