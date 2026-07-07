@@ -23,19 +23,23 @@ Task 2/
 └── README.md             # Documentation
 ```
 
-## Features Implemented
+## API Endpoints & Features
 
-The following main features and endpoints have been implemented:
+The following main features and endpoints have been identified and implemented based on the [Fingerspot Developer Documentation](https://developer.fingerspot.io):
 
-1.  **Authentication**: Bearer token implementation required for all requests.
-2.  **Get Device List**: Retrieve all registered attendance machines (`/api/get_device`).
-3.  **Get Attendance Logs**: Fetch scan data with date range filtering (`/api/get_attlog`).
-4.  **Add Employee**: Upload user info to the device (`/api/set_userinfo`).
-5.  **Delete Employee**: Remote user deletion (`/api/delete_userinfo`).
-6.  **Remote Registration**: Trigger online registration mode (`/api/reg_online`).
-7.  **Sync Time**: Remote timezone/time synchronization (`/api/set_time`).
-8.  **Restart Machine**: Remote system restart (`/api/restart`).
-9.  **Webhook Receiver**: Handling real-time push data for logs and command responses.
+| Feature | Endpoint | Method | Description |
+| :--- | :--- | :--- | :--- |
+| **Authentication** | - | - | Uses Bearer Token in the `Authorization` header for all requests. |
+| **Get Device List** | `/api/get_device` | `POST` | Retrieves a list of all devices registered to the account. |
+| **Get Attendance Logs** | `/api/get_attlog` | `POST` | Retrieves scan records from a specific device within a date range (max 2 days). |
+| **Set User Info** | `/api/set_userinfo` | `POST` | Adds or updates user data (PIN, Name, Biometrics) on a device. |
+| **Get User Info** | `/api/get_userinfo` | `POST` | Requests user details from a device (Asynchronous, results via Webhook). |
+| **Delete User Info** | `/api/delete_userinfo` | `POST` | Remotely deletes a specific user/PIN from a device. |
+| **Register Online** | `/api/reg_online` | `POST` | Triggers remote registration mode (Fingerprint, Face, Card, Password). |
+| **Set Time** | `/api/set_time` | `POST` | Synchronizes device clock or changes the timezone offset. |
+| **Restart Device** | `/api/restart` | `POST` | Remotely reboots the attendance machine. |
+| **Get User ID List** | `/api/get_userid_list` | `POST` | Retrieves all PIN numbers registered on a specific device. |
+| **Real-time Webhook** | (Custom URL) | `POST` | A listener endpoint to receive real-time scans and command responses. |
 
 ## Requirements
 

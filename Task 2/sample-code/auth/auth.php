@@ -16,29 +16,50 @@ $apiToken = 'YOUR_API_TOKEN_HERE';
 // Every request to Fingerspot API must include the Bearer Token in the Authorization header
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 /**
  * Helper function to demonstrate how headers are used in a cURL request
+ *
+ * @param string $url The API endpoint URL
+ * @param array $headers The array of HTTP headers
+ * @return array The response and HTTP code
  */
 function testAuthentication($url, $headers) {
+    $error_msg = null;
     $ch = curl_init($url);
 
     // Set cURL options
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // For local testing if needed
+    curl_setopt($ch, CURLOPT_POST, true); // Fingerspot API uses POST for most actions
+
+    /**
+     * SECURITY NOTE:
+     * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+     * This ensures the SSL certificate of the API server is verified.
+     *
+     * Setting this to false is strictly for local development troubleshooting only
+     * if you encounter SSL certificate issues on your local machine.
+     */
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
     // Execute request
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
+    if (curl_errno($ch)) {
+        $error_msg = curl_error($ch);
+    }
+
     curl_close($ch);
 
     return [
         'code' => $httpCode,
-        'response' => $response
+        'response' => $response,
+        'error' => $error_msg
     ];
 }
 
@@ -52,22 +73,28 @@ foreach ($headers as $header) {
 echo "\nNote: This is a configuration sample. Use these headers in all your API requests.\n";
 
 /*
-Example Request Headers:
-GET /api/get_device HTTP/1.1
+Example Request:
+POST /api/get_device HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
-Example Response (if token is invalid):
+{
+    "trans_id": "1"
+}
+
+Example Response (Success):
+{
+    "status": true,
+    "message": "Success",
+    "data": [...]
+}
+
+Example Response (Unauthorized):
 {
     "status": false,
     "message": "Unauthorized"
-}
-
-Example Response (if token is valid):
-{
-    "status": true,
-    "data": [...]
 }
 */
 ?>

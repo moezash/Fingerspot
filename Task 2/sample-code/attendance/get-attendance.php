@@ -14,8 +14,9 @@ $cloudId  = 'YOUR_CLOUD_ID_HERE'; // The ID of your attendance machine
 $apiUrl   = 'https://developer.fingerspot.io/api/get_attlog';
 
 // 2. Prepare Data
+// Fingerspot recommends a maximum of 2 days range per request.
 $data = [
-    'trans_id'   => '1',                // Unique ID for this request
+    'trans_id'   => uniqid(),           // Unique ID for this request
     'cloud_id'   => $cloudId,           // Device Cloud ID
     'start_date' => date('Y-m-d'),      // Start date (YYYY-MM-DD)
     'end_date'   => date('Y-m-d')       // End date (YYYY-MM-DD)
@@ -24,7 +25,8 @@ $data = [
 // 3. Prepare Headers
 $headers = [
     'Authorization: Bearer ' . $apiToken,
-    'Content-Type: application/json'
+    'Content-Type: application/json',
+    'Accept: application/json'
 ];
 
 // 4. Initialize cURL
@@ -35,7 +37,12 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+/**
+ * SECURITY NOTE:
+ * CURLOPT_SSL_VERIFYPEER is set to true by default for production security.
+ */
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
 // 6. Execute Request
 $response = curl_exec($ch);
@@ -43,7 +50,7 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 // 7. Check for errors
 if (curl_errno($ch)) {
-    echo 'Error: ' . curl_error($ch);
+    echo 'cURL Error: ' . curl_error($ch);
 } else {
     // 8. Process Response
     $result = json_decode($response, true);
@@ -53,19 +60,23 @@ if (curl_errno($ch)) {
     echo "Date Range: " . $data['start_date'] . " to " . $data['end_date'] . "\n";
     echo "HTTP Status Code: $httpCode\n\n";
 
-    if ($result && isset($result['status']) && $result['status']) {
+    if ($result === null) {
+        echo "Error: Invalid JSON response.\n";
+        echo "Raw Response: " . $response . "\n";
+    } elseif ((isset($result['status']) && $result['status']) || (isset($result['success']) && $result['success'])) {
         echo "Logs retrieved successfully:\n";
-        if (isset($result['data']) && !empty($result['data'])) {
+        if (isset($result['data']) && !empty($result['data']) && is_array($result['data'])) {
             foreach ($result['data'] as $log) {
-                echo "- PIN: " . $log['pin'] . " | Time: " . $log['scan'] . " | Status: " . $log['status_scan'] . "\n";
+                echo "- PIN: " . ($log['pin'] ?? 'N/A') . " | Time: " . ($log['scan'] ?? 'N/A') . " | Status: " . ($log['status_scan'] ?? 'N/A') . "\n";
             }
         } else {
             echo "No logs found for the selected period.\n";
         }
     } else {
+        $message = $result['message'] ?? 'Unknown error';
         echo "Failed to retrieve logs.\n";
-        echo "Error Message: " . ($result['message'] ?? 'Unknown error') . "\n";
-        echo "Full Response: " . $response . "\n";
+        echo "API Message: " . $message . "\n";
+        echo "Response: " . $response . "\n";
     }
 }
 
@@ -77,12 +88,13 @@ POST /api/get_attlog HTTP/1.1
 Host: developer.fingerspot.io
 Authorization: Bearer YOUR_API_TOKEN_HERE
 Content-Type: application/json
+Accept: application/json
 
 {
-    "trans_id": "1",
+    "trans_id": "65f1234567890",
     "cloud_id": "FTV123456",
-    "start_date": "2024-01-01",
-    "end_date": "2024-01-07"
+    "start_date": "2024-03-01",
+    "end_date": "2024-03-02"
 }
 
 Example Response (Success):
@@ -92,13 +104,13 @@ Example Response (Success):
     "data": [
         {
             "pin": "1",
-            "scan": "2024-01-01 08:00:15",
+            "scan": "2024-03-01 08:00:15",
             "verify": "1",
             "status_scan": "0"
         },
         {
             "pin": "1",
-            "scan": "2024-01-01 17:05:30",
+            "scan": "2024-03-01 17:05:30",
             "verify": "1",
             "status_scan": "1"
         }
