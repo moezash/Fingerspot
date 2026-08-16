@@ -1,0 +1,26 @@
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Credentials / keys
+*.pem
+*.key
+*.p12
+credentials.json
+secrets.json
+auth.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Logs & runtime
+*.log
+webhook_log.txt
