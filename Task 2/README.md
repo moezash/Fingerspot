@@ -2,6 +2,12 @@
 
 Aplikasi PHP native untuk mengirim command ke Fingerspot API, menerima callback dan event melalui webhook, menyimpan hasilnya ke MySQL/MariaDB, serta menampilkan riwayat integrasi melalui dashboard.
 
+## Download Project
+
+[Download Task 2 - Fingerspot Integration (ZIP)](./Task2-Fingerspot.zip)
+
+Arsip ZIP tidak menyertakan file `.env` atau credential lokal. Setelah mengunduh, salin `.env.example` menjadi `.env` lalu isi konfigurasi milik Anda.
+
 ## Tujuan Project
 
 Project ini dibuat untuk:
