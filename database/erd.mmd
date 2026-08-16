@@ -1,0 +1,80 @@
+erDiagram
+    attlogs {
+        int id PK
+        varchar cloud_id
+        varchar pin
+        datetime scan_time
+        int verify
+        int status_scan
+        text raw_payload
+        timestamp created_at
+    }
+
+    userinfos {
+        int id PK
+        varchar cloud_id
+        varchar pin
+        varchar name
+        varchar privilege
+        int finger
+        int face
+        varchar password
+        varchar rfid
+        text raw_payload
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    pins {
+        int id PK
+        varchar cloud_id
+        varchar pin
+        text raw_payload
+        timestamp created_at
+    }
+
+    api_requests {
+        int id PK
+        varchar endpoint
+        varchar method
+        varchar cloud_id
+        varchar trans_id
+        text request_payload
+        text response_payload
+        int http_status
+        enum status
+        text error_message
+        timestamp created_at
+    }
+
+    webhook_responses {
+        int id PK
+        varchar type
+        varchar cloud_id
+        varchar trans_id
+        text raw_payload
+        enum status
+        text error_message
+        timestamp received_at
+        timestamp processed_at
+    }
+
+    command_logs {
+        int id PK
+        varchar command_type
+        varchar cloud_id
+        varchar trans_id
+        varchar pin
+        enum status
+        text request_payload
+        text response_payload
+        text notes
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    api_requests ||--o{ command_logs : "trans_id tracks"
+    webhook_responses ||--o{ command_logs : "updates status via trans_id"
+    webhook_responses ||--o{ attlogs : "creates on type=attlog"
+    webhook_responses ||--o{ userinfos : "creates on type=get_userinfo"
+    webhook_responses ||--o{ pins : "creates on type=get_allpin"
